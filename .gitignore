@@ -8,3 +8,4 @@ _check.js
 .wxt/
 .env
 bash.exe.stackdump
+packages/extension/bash.exe.stackdump
