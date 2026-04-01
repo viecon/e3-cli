@@ -1,0 +1,78 @@
+--- PAGE 1 ---
+NYCU CS
+Prof. Chien-Chao Tseng ( 曾建超教授 )
+Department of Computer Science
+National Yang Ming Chiao Tung University
+cctseng@ cs.nctu.edu.tw網路規劃與管理實務 (1155)
+Network Planning and Management Practices
+Syllabus
+Syllabus 1
+--- PAGE 2 ---
+NYCU CS
+網路規劃與管理實務
+Network Planning and Management Practices
+Syllabus 2Instructor: 曾建超; Chien-Chao Tseng
+e-mail: cctseng@cs.nctu.edu.tw 
+Office: EC626,  Tel: (57) 31867
+Pre-requisites: Introduction to Computer Networks
+•npta@courses.cs.nycu.edu.tw
+•TA Hours: Tue 19:00 ~ 22:00
+•EC320 系資訊中心 , Tel: 54707蔣汶儒、洪祥銘、許仲宇、陳立、
+賴羿茗、施羿廷、周廷威、蔡語宸、
+陳芷桓、袁律恆、王行楷TAs:
+Textbook: N/A
+References: https://www.netacad.com/
+Evaluation: Labs: 40% (10% x 4) 、團體上機測驗 : 20% (上機)、
+Final: 20% ( 筆試) + 20% (上機)
+--- PAGE 3 ---
+NYCU CS
+課程大綱
+●主題:
+「路由器與交換器」建置與管理
+●內容:
+網路管理知識與實務
+◦使用者端網路交換器 ⬄機房內路由器與骨幹網路
+●教材: 
+◦Cisco Certified Network Associate(CCNA) Routing and Switching 教學內容
+◦Cisco Packet Tracer 軟體
+◦NYCU CSIT Training Materials
+●目標:藉由網路建置與管理教學及實驗
+◦培育網路實務經驗及設備管理技能
+◦為校系資訊中心儲備人才
+3
+--- PAGE 4 ---
+NYCU CS
+Demo Lab In-class practice Class Date 
+和平紀念日補假 (放假) 2/27
+Lab1 Linux network NAT3/6
+basic switch N/A3/13
+Lab1 Lab2 VLAN Configuration VLAN3/20
+STP Configuration STP3/27
+兒童節及民族掃墓節連假4/3
+Lab2 Lab3 static route, RIP Routing (IGP, BGP, dist. vector)4/10
+OSPF Single OSPF Single, Multi-Area 概念 4/17
+OSPF Multi-Area, ACL, AAA AAA, ACL4/24
+勞動節(放假) 5/1
+Lab3 Lab4 VyOS, wireguard, tunnel Tunnel, VPN Concept5/8
+LACP, VRRP HA5/15
+Final Review (Hands-on Switch Lab) N/A5/22
+團體上機5/29
+Lab4 Final (筆試) 學期考試6/5
+Final (純上機) 學期考試 (8日-12日) 6/12
+4
+--- PAGE 5 ---
+NYCU CS
+上課方式與規範
+●中文授課，中英文講義
+◦The course is taught in Chinese. 
+◦Course material may be in Chinese or English
+●上課地點
+EC324
+●Demo規範
+◦每個Lab 都要demo
+◦沒來Demo，該作業以 0 分計
+◦Demo 時間會於作業公告時㇐併告知
+5
+--- PAGE 6 ---
+NYCU CS
+Q & A

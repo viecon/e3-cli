@@ -1,0 +1,445 @@
+--- PAGE 1 ---
+1
+Lab 4. STP Conﬁguration 
+網路規劃管理與實務 - CCNA 2026 Spring 
+Author: 
+周廷威 < twchou@it.cs.nycu.edu.tw > 
+Credit to 紀政良（clc） 
+--- PAGE 2 ---
+2
+2What is STP? 
+●Spanning Tree Protocol 
+●A layer 2 protocol 
+●Runs on switches and bridges 
+●Switches need to be enabled for STP within the same network 
+●Create a loop-free network 
+●Track all the links and blocks the redundant link 
+
+--- PAGE 3 ---
+3
+3Need for STP 
+●Broadcast storm 
+●MAC database instability 
+●Multiple frame transmission 
+[Note]  In the environment of Packet Tracer, we can use                                
+> no spanning-tree vlan 1 to see the problems above 
+--- PAGE 4 ---
+4
+4Types of STP 
+Protocol Standard Resources Needed Convergence Tree Calculation 
+STP 802.1D Low Slow All VLANs 
+PVST+  [1]Cisco High Slow Per VLAN 
+RSTP 802.1w Medium Fast All VLANs 
+Rapid PVST+ Cisco Very high Fast Per VLAN 
+MSTP 802.1s Medium or high Fast Per Instance 
+(config)# spanning-tree mode mode [1] Cisco IOS use PVST+ as default mode 
+--- PAGE 5 ---
+5
+5Need for STP 
+●Broadcast storm 
+●MAC database instability 
+●Multiple frame transmission 
+[Note]  In the environment of Packet Tracer, we can use no spanning-tree 
+vlan 1 to see the problems above 
+--- PAGE 6 ---
+6
+6BPDU 
+●Bridge Protocol Data Units (BPDUs) frames contains 
+○ switch ID, MAC address, switch port priority, switch port cost, etc. 
+●Send out as multicast address at 01:80:c2:00:00:00 
+●Types of BPDU 
+○ Conﬁguration BPDU (CBPDU) 
+○ Topology Change Notiﬁcation (TCN) 
+○ Topology Change Acknowledgement (TCA) 
+--- PAGE 7 ---
+7
+7STP Process 
+●Elect a root bridge 
+●Place root interface to forwarding state 
+●Choose root port for each non-root bridge 
+●Choose designated port for each remaining link 
+●Put all other ports into blocking state 
+
+--- PAGE 8 ---
+8
+8STP Process 
+●Elect a root bridge 
+●Place root interface to forwarding state 
+●Choose root port for each non-root bridge 
+●Choose designated port for each remaining link 
+●Put all other ports into blocking state 
+
+--- PAGE 9 ---
+9
+9STP Process 
+●Elect a root bridge 
+●Place root interface to forwarding state 
+●Choose root port for each non-root bridge 
+●Choose designated port for each remaining link 
+●Put all other ports into blocking state 
+FWD FWD 
+--- PAGE 10 ---
+10
+10STP Process 
+●Elect a root bridge 
+●Place root interface to forwarding state 
+●Choose root port for each non-root bridge 
+●Choose designated port for each remaining link 
+●Put all other ports into blocking state 
+FWD FWD 
+RP RP
+--- PAGE 11 ---
+11
+11STP Process 
+●Elect a root bridge 
+●Place root interface to forwarding state 
+●Choose root port for each non-root bridge 
+●Choose designated port for each remaining link 
+●Put all other ports into blocking state 
+FWD FWD 
+RP RP
+DP
+--- PAGE 12 ---
+12
+12STP Process 
+●Elect a root bridge 
+●Place root interface to forwarding state 
+●Choose root port for each non-root bridge 
+●Choose designated port for each remaining link 
+●Put all other ports into blocking state 
+FWD FWD 
+RP RP
+DP BP
+--- PAGE 13 ---
+13
+13Port Roles 
+●Root port 
+○ Ports on non-root switches with the best cost path to root bridge. These ports forward 
+data to the root bridge. 
+●Designated port 
+○ Ports on root and designated switches. All ports on the root bridge will be designated. 
+●Blocked port 
+○ All other ports to bridges or switches are in a blocked state. Access ports going to 
+workstations or PCs are not aﬀected. 
+--- PAGE 14 ---
+14
+14STP Process 
+●Elect a root bridge 
+●Place root interface to forwarding state 
+●Choose root port for each non-root bridge 
+●Choose designated port for each remaining link 
+●Put all other ports into blocking state 
+
+--- PAGE 15 ---
+15
+15Bridge Priority 
+●Bridge priority only allows to be in multiple of 4096 
+
+--- PAGE 16 ---
+16
+16switch# show spanning-tree 
+VLAN0001 
+  Spanning tree enabled protocol rstp 
+  Root ID Priority   32769 
+  Address     0025.b4c1.b400 
+  This bridge is the root 
+  Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec 
+  Bridge ID  Priority   32769  (priority 32768 sys-id-ext 1) 
+ Address     0025.b4c1.b400 
+ Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec 
+ Aging Time  300 sec Bridge Priority 
+priority + sys-id-ext ●Two ways to change bridge priority 
+(config)# spanning-tree vlan  vlan-id  root [ primary | secondary ] 
+(config)# spanning-tree vlan  vlan-id  priority value 
+--- PAGE 17 ---
+17
+17STP Process 
+●Elect a root bridge 
+●Place root interface to forwarding state 
+●Choose root port for each non-root bridge 
+●Choose designated port for each remaining link 
+●Put all other ports into blocking state 
+FWD FWD 
+--- PAGE 18 ---
+18
+18STP Process 
+●Elect a root bridge 
+●Place root interface to forwarding state 
+●Choose root port for each non-root bridge 
+●Choose designated port for each remaining link 
+●Put all other ports into blocking state 
+FWD FWD 
+RP RP
+--- PAGE 19 ---
+19
+19STP Cost 
+●Conﬁgure interface cost 
+(config)# interface interface 
+(config-if)# spanning-tree vlan value cost value 
+●Show spanning tree cost 
+switch# show spanning-tree vlan 1 
+...
+Interface  Role   Sts Cost   Prio.Nbr Type 
+---------  -----   ----- -----  --------  -------- 
+Fa0/1    Root   FWD  19   128.8   P2p
+Fa0/2    Desg   FWD 40   128.2   P2p
+...
+Link Speed Cost
+10 Gb/s 2
+1 Gb/s 4
+100 Mb/s 19
+10 Mb/s 100
+--- PAGE 20 ---
+20
+20Root port selection 
+1. Lowest cost 
+2. Lowest neighbor bridge ID 
+3. Lowest neighbor port priority 
+4. Lowest neighbor physical port number 
+--- PAGE 21 ---
+21
+21STP Process 
+●Elect a root bridge 
+●Place root interface to forwarding state 
+●Choose root port for each non-root bridge 
+●Choose designated port for each remaining link 
+●Put all other ports into blocking state 
+FWD FWD 
+RP RP
+DP
+--- PAGE 22 ---
+22
+22Designated port selection 
+1. Lowest accumulated cost to the root bridge 
+2. Lowest bridge ID 
+--- PAGE 23 ---
+23
+23STP Process 
+●Elect a root bridge 
+●Place root interface to forwarding state 
+●Choose root port for each non-root bridge 
+●Choose designated port for each remaining link 
+●Put all other ports into blocking state 
+FWD FWD 
+RP RP
+DP BP
+--- PAGE 24 ---
+24
+24Port States 
+
+--- PAGE 25 ---
+25
+25Topology Change 
+●Send TCN (topology change notiﬁcation) on its root port 
+●Upstream bridge responds an TCA (topology change acknowledgement) 
+●Root bridge send BPDU with TC bit set 
+●Lower their MAC table address aging time (from 300s to 15s) 
+--- PAGE 26 ---
+26
+26Port States 
+
+--- PAGE 27 ---
+27
+27STP Convergence 
+●50 seconds for going through all state 
+--- PAGE 28 ---
+28
+28STP Timer 
+●Hello Timer (default 2 sec) 
+○ The frequency of sending BPDU 
+●Max Age Timer (default 20 sec) 
+○ The maximum length of time a switch saves BPDU information 
+●Forward Delay Timer (default 15 sec) 
+○ The time spent on the listening and learning states 
+--- PAGE 29 ---
+29
+29STP Timer 
+●The diameter is the maximum number of switches that a frame or packet 
+must cross to connect any two switches 
+●Diameter conﬁguration ( deprecated on Packet Tracer )
+Diameter 2 3 4 5 6 7
+Hello Time 2 2 2 2 2 2
+Max Age 10 12 14 16 18 20
+Forward Delay 7 9 10 12 13 15(config)# spanning-tree vlan vlan-id root primary diameter size 
+--- PAGE 30 ---
+30
+30STP Enhancements 
+●PortFast 
+●BPDU Guard 
+●BPDU Filter 
+●Root Guard 
+--- PAGE 31 ---
+31
+31PortFast 
+●Allow a port to enter from blocking to forwarding state immediately, 
+bypassing the listening and learning states 
+●You will see warning as below after conﬁguring PortFast 
+%Warning: portfast should only be enabled on ports connected to a single 
+host. Connecting hubs, concentrators, switches, bridges, etc… to this 
+interface when portfast is enabled, can cause temporary bridging loops. 
+   Use with CAUTION 
+●Need to wait for convergence to communicate with a port on which the 
+PortFast feature is disabled (normally a port connected to another switch). 
+●Never enable PortFast on a Trunk port! 
+--- PAGE 32 ---
+32
+32PortFast Conﬁguration 
+●Configure PortFast on a switch port 
+(config)# interface interface 
+(config-if)# spanning-tree portfast 
+●Enable PortFast on all nontrunking interfaces 
+(config)# spanning-tree portfast default 
+with Portfast without Portfast 
+--- PAGE 33 ---
+33
+33BPDU Guard 
+●If BPDU guard is enabled, it puts the port in an err-disabled  state when 
+receiving a BPDU 
+○  This will eﬀectively shut down the port 
+●The BPDU guard feature provides a secure response to invalid 
+conﬁgurations because you must manually put the interface back into 
+service 
+○ shutdown the interface and no shutdown  it back to recover 
+●Turn on BPDU Guard 
+(config)# interface interface 
+(config-if)# spanning-tree bpduguard enable 
+--- PAGE 34 ---
+34
+34BPDU Filter 
+●Similar to BPDU Guard, but just “ﬁlter” it 
+●Two diﬀerent conﬁguration styles, with diﬀerent behaviors 
+○ Conﬁgure it globally 
+○ Conﬁgure it on the speciﬁed port 
+--- PAGE 35 ---
+35
+35BPDU Filter 
+●When conﬁgured globally 
+○ Aﬀect all operational PortFast ports 
+○ If BPDUs are seen on the port 
+1.  The port loses its PortFast status 
+2.  BPDU ﬁltering is disabled 
+3.  STP sends and receives BPDUs as any other STP port 
+○ Upon startup, the port transmits ten BPDUs. If this port receives any BPDUs during that 
+time, PortFast and BPDU ﬁltering are disabled 
+●When conﬁgured on an individual port 
+○ Ignore all BPDUs received 
+○ Send no BPDUs 
+--- PAGE 36 ---
+36
+36BPDU Filter Conﬁguration 
+●Enable BPDU ﬁltering globally ( deprecated on Packet Tracer ) 
+# show spanning-tree summary totals 
+# show spanning-tree interface interface  detail (config)# interface  interface 
+(config-if)# spanning-tree bpdufilter enable 
+●To verify the configuration ●Enable BPDU filtering on a specific switch port ( deprecated on Packet Tracer )(config)# spanning-tree portfast bpdufilter default 
+--- PAGE 37 ---
+37
+37Root Guard 
+●Root guard is conﬁgured on a per-port basis 
+●If there is a superior BPDU received on the port, root guard does not take 
+the BPDU into account and so puts the port into root inconsistent state 
+●Root guard conﬁguration 
+(config)# interface interface 
+(config-if)# spanning-tree guard root 
+switch# show spanning-tree inconsistentports 
+Name Interface Inconsistency 
+-------------------- -------------------- ------------------ 
+VLAN0001 FastEthernet0/4 Root Inconsistent 
+Number of inconsistent ports (segments) in the system : 1 
+--- PAGE 38 ---
+38
+38Reference 
+●https://www.omnisecu.com/cisco-certiﬁed-network-associate-ccna/index
+.php 
+●https://www.youtube.com/watch?v=japdEY1UKe4&t=273s 
+--- PAGE 39 ---
+39
+39VLAN Review 
+--- PAGE 40 ---
+40
+40VLAN STP Review 
+
+--- PAGE 41 ---
+41
+41VLAN STP Review 
+●End devices x-y IP: 192.168.x0.y/24, GW: 192.168.x0.254 
+●VLAN: As shown in the diagram, enable VLAN 10 or VLAN 20 and name it as 
+VLAN{num}. 
+●Configure Sw1-3 and L3-Sw so that devices on the same LAN can communicate with 
+each other. 
+●Configure the Gateway on L3-Sw to allow communication between different LANs. 
+●Set the spanning-tree mode to rapid-pvst. (config)# ip default-gateway x.x.x.x 
+--- PAGE 42 ---
+42
+42VLAN STP Review 
+●Enable Portfast and BPDU guard on the ports for End Devices. 
+●Ports 2-4 have been connected as a switch by a user. How can you adjust the settings 
+so that the connection remains functional without taking over as the spanning tree 
+root? 
+--- PAGE 43 ---
+43
+43Practice Homework (Not Graded) 
+--- PAGE 44 ---
+44
+44STP 的重要性 
+1. 在 L2 環境中，STP 的扮演著不可或缺的⾓⾊，如果缺少 STP，會造成 MAC 
+database instability, broadcast storms, multiple frame transmission 等事 情
+發⽣。請使⽤ packet tracer 的功能，模擬並截圖說明如果下圖的拓樸缺少 
+STP 會發⽣什麼嚴重的後果。（擇⼆說明即可） 
+
+--- PAGE 45 ---
+45
+45作業要求 
+2. 下⾴圖⽚為⼀簡單網路拓樸，若此拓樸使⽤的協定為 PVST，根據圖上提供的
+資訊回答下列問題 
+a. 請問此拓樸最有可能是 VLAN 多少？
+b. 請找出此 Spanning 的 root，並標⽰出各介⾯的 STP role 以及那些線路不會有流量經過 
+--- PAGE 46 ---
+46
+46作業要求 
+priority: 32770 
+MAC: 000c.834b.80bc 
+priority: 32770 
+MAC: 001d.725c.3144 
+priority: 32770 
+MAC: 38ce.bc53.008f 
+priority: 32770 
+MAC: 002f.826c.2781 
+fa0/23 fa0/24 fa0/22 
+Gi0/24 Gi0/23 fa0/21 
+fa0/22 Fa0/3 Gi0/10 Gi0/21 fa0/21 fa0/3 
+--- PAGE 47 ---
+47
+47作業要求 
+3. 假設你是交⼤資⼯某實驗室的網管，你發現牆壁上有兩個網路孔 (以下稱為壁
+孔)，如下圖所⽰，已知兩壁孔後端連接⾄同⼀網路設備。然⽽，兩個壁孔並不
+⾜以提供整間實驗室使⽤，於是你決定⾃⼰買⼀台網路設備供實驗室使⽤。請
+依照課堂所學的內容，回答下⾴問題 
+
+--- PAGE 48 ---
+48
+48作業要求 
+a. 此⼆壁孔後端最有可能連接⾄何種網路設備？請回答 Switch, Router 或 L3 
+switch 並敘述原因 
+b. 相較於只連接⼀個壁孔，同時將兩個壁孔連接⾄你⾃⼰購買的網路設備，是否
+能有效增加你所購買之網路設備與壁孔之間的頻寬？為什麼？ 
+c. 在你⾃⼰購買的網路設備上，除了連接壁孔的 interface 之外，是否適合在其
+他 interface 上設定 portfast 功能？原因為何？ 
+--- PAGE 49 ---
+49
+49作業要求 
+4. ⾝為優質的實驗室網管，你獲得了成為系計中助教的機會，除了整天吸貓貓之
+外你還必須管理⼯三網路。如果有⼀網路拓樸如下圖，根據你強⼤的網路知識
+，請回答下⾴問題 
+
+--- PAGE 50 ---
+50
+50作業要求 
+a. 此網路拓樸有⼀⼤缺點，故通常網管⼈員會極⼒避免做出此拓樸。請問此缺點
+為何？應如何避免？ 
+b. 承(a)，若實驗室想把 PC 換成 switch，欲讓實驗室內部的交換器也能參與⼯三
+網路 STP 選舉，卻不希望讓 Spanning Tree 的根橋接器⾓⾊被實驗室搶⾛，應
+在哪台機器上做哪些設定？ 
+c. 承(a)，若不希望實驗室內部的交換器參與⼯三網路 STP 選舉，卻允許實驗室內
+部⾃⾏安裝交換器，且當 BPDU 封包進⼊壁孔時該 interface 不會被關閉，應
+在哪些機器上做哪些設定? 

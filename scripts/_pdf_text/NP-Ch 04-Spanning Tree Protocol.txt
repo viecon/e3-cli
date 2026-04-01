@@ -1,0 +1,338 @@
+--- PAGE 1 ---
+NYCUCS
+Chien-Chao TsengSpanning Tree Protocol (STP)
+1-1
+--- PAGE 2 ---
+NYCUCS
+Redundancy at OSI Layers 1 and 2
+2Multiple cabled paths between switches provide physical redundancy
+Improves reliability and availability of networks
+◦Alternate physical paths for data to traverse the network
+Possible to access network resources, despite path disruption
+Source: Cisco
+--- PAGE 3 ---
+NYCUCS
+Ethernet Frame Structure
+3Preamble:7 bytes , to synchronize receiver, sender clock rates, 10101010
+▪Start Frame Delimiter (SFD):One byte, 101010 11
+Mac Addresses: 6 bytes, Flat
+Type:indicates higher-layerprotocol
+◦Mostly IP, but others possible (e.g., Novell IPX, AppleTalk): 
+▪0x0800: IPv4, 0x0806: ARP
+CRC: checked at receiver, frame droppedif error detected
+Behavior of an adapter on receiving a frame with
+◦Matching Destination Address , Broadcast Address (e.g., ARP packet), 
+or Participating Multicast Address
+passesdata in the frame to the Network Layer protocol
+◦Otherwise, discardsframeDest.
+AddressSource
+AddressData 
+(Payload)CRC Preamble Type
+Data Link 
+Link
+Transport
+Network 
+Application
+Data
+Source: AA
+B
+C1
+234Dest: C
+C  A(1)
+D
+--- PAGE 4 ---
+NYCUCS
+Switch Table and Self-Learning
+4Each switch has a switch table
+Table entry:
+◦MAC Address of Host, Interface to Reach Host, Time Stamp
+◦Looks like a routing table
+How does aswitch create and maintain table entries? 
+MAC Learning
+Self-learning “which hosts can be reached through which interfaces”
+◦When a switch receives a frame, it
+▪Learns the location (port) of the sender (incoming LAN segment)
+▪Records Sender-MAC/Port pair in switch tableMAC Addr Interface     TTL
+Source: AA
+B
+C1
+234Dest: C
+C  A(1)
+D
+--- PAGE 5 ---
+NYCUCS
+Flooding, Forwarding and Self-learning (MAC Learning)
+5Assume switch table is initially empty
+1)AC: 
+Destination C location unknown
+‒Flood
+◦MAC Learning
+▪Update switch table 
+2)C A: 
+Destination A location known
+‒Unicast (Selectively send on just one link)
+◦MAC Learning
+▪Update switch table MAC Addr Interface    TTL
+A 1 60
+C 3 60MAC Addr Interface   TTL
+A 160Source: AA
+B
+C1
+234Dest: C
+C  A
+A   C(1)
+(2)
+DMAC Addr Interface    TTL
+--- PAGE 6 ---
+NYCUCS
+Frame Filtering/Forwarding Algorithm
+6Algorithm: when a switch receives frame
+1. records incoming link, MAC address of sending host
+2. indexes switch table using MAC destination address
+3. ifentry found for destination
+then {
+ifdestination on segment from which frame arrived
+thendrop frame
+elseforward frame on interface indicated by entry
+}
+elseflood /* forward on all interfaces except arriving
+interface */
+Note: Spanning Tree Protocol (STP, later in class)
+◦https://www.youtube.com/watch?v=japdEY1UKe4 , Step by Step, by CertBrosSkip
+--- PAGE 7 ---
+NYCUCS
+Logical Layer 2 Loops
+7Physical redundant paths may cause logical Layer 2 loops
+◦Due to switch MAC learning and forwarding (flooding) process
+Recall: Howswitches react to 
+◦Broadcast messages or 
+◦Unicastmessages with unknown addresses 
+Forward frame out of every port, except the one that receives it (Flooding)
+Three primary issues :
+1.Broadcast Storm
+2.MAC Database (address table) Instability 
+3.Multiple-frame transmission
+Solution:Spanning Tree Protocol (STP)
+Reference: https://www.youtube.com/watch?v=japdEY1UKe4
+◦Spanning Tree Protocol Explained | Step by Step, by CertBros
+SW A
+SW B SW C
+B
+ A
+--- PAGE 8 ---
+NYCUCS
+Primary Issues of Layer 2 Loops
+81.Broadcast storm —
+Each switch may flood broadcasts endlessly, 
+(if without some loop-avoidance process.) 
+2.MAC Database (Address Table) Instability—
+Copies of the same frame being received 
+on different ports of the switch.
+(MAC learning) 
+3.Multiple-frame Transmission —
+Multiple copies of unicast frames may be delivered to destination stations. 
+◦Can cause unrecoverable errors 
+▪Many protocols expect to receive only a single copy of each transmission 
+Uses STPto prevent loops when using redundant switches
+SW A
+SW B SW C
+B
+ A
+--- PAGE 9 ---
+NYCUCS
+Objective and Idea of Spanning Tree Protocol 
+9Objective:
+to ensure “ only one logical path between all destinations” on the network
+Idea: 
+Intentionally blockingports of redundant paths that could cause a loop
+◦User Data: prevented from entering or leaving that port
+◦STP Control frames:allowed to pass through.
+Multiple physical paths still exist, 
+◦Butdisabled to prevent the loops from occurring
+◦On a link or switch failure
+▪STPrecalculates the pathsand unblocks the necessary ports 
+Allow the redundant path to become activeSW A
+SW B SW C
+
+--- PAGE 10 ---
+NYCUCS
+STP Standards
+10IEEE 802.1D STP and Rapid STP (RSTP) 
+◦Uses the Spanning Tree Algorithm (STA) to determine 
+▪Root Bridge (Root Switch)
+▫Used as the reference point for all path calculations
+▪Which switch ports must be put in the Blocking State (to prevent loops)
+◦Relies on Bridge Protocol Data Unit (BPDU): control message used by STP
+▪Encapsulated in an Ethernetframe
+Blocking BlockingSW A
+SW C SW D
+Root Bridge
+SW B
+SW E SW F
+--- PAGE 11 ---
+NYCUCS
+Port Roles in STP
+11Root Ports(RPs) : Selected on a per-switch basis
+◦The port on a switch with the best route to the Root Bridge (in terms of path cost.) 
+◦In Forwarding State
+◦Note: Root Bridge is the only bridge that does not have a Root Port 
+Designated Port (DP) : Selected on a per-linkbasis
+◦Port on a link (segment) with thebest route to Root Bridge
+▪The switch with the port is called Designated switch
+◦In Forwarding State
+◦Note: All ports on the Root Bridge
+areDesignated Ports
+Blocked port
+All other remaining ports, 
+except access ports Designated Switches
+SW A
+SW C SW D
+SW B
+SW E SW FBlocking
+RPRPRP
+RPRPDP
+DPDP DP
+DP DPBlockingRoot Bridge
+--- PAGE 12 ---
+NYCUCS
+STP Procedure
+12Each switch runs STP
+Via exchanging STP control messages ( BPDU)
+1.Elect the Root Bridge
+Set Root switch interfaces as Designated Ports (Forwarding State)
+2.Choose the Root Port for each Non-Root Bridge 
+3.Choose the Designated Port for each remaining link
+4.Put all remaining ports in the Blocking State
+SW A
+SW C SW D
+SW B
+SW E SW FBlocking
+RPRPRP
+RPRPDP
+DPDPDP
+DP DPBlockingRoot Bridge
+--- PAGE 13 ---
+NYCUCS
+Bridge ID (BID)
+13Bridge ID (BID): 
+◦2 Bytes originally, 
+◦8 Bytes now
+Two parts of BID :
+◦Bridge Priority :
+▪Automatically assigned, 
+but configurable
+▪Value between 0and 65,535, default is 32,768
+▪Extended System ID (optional): borrowing 12 bitsfrom the originalBridge 
+Priority
+▫a VLAN ID or 
+▫a multiple spanning tree protocol (MSTP) instance ID
+◦MAC Address : MAC address of sending switch
+Bridge 
+PriorityExtended
+System IDMAC
+Address
+4 Bits               12 Bits             48 Bits   
+Bridge ID 
+with 
+Extended 
+System IDBridge Priority MAC
+--- PAGE 14 ---
+NYCUCS
+Root Bridge Election
+14BPDU: Bridge Protocol Data Unit, STP control messages
+Contains information necessary to configure and maintain spanning tree topology.
+Root Bridge Election
+◦All switches participating in STP exchange BPDUframes, 
+BPDU carrying (sender) Bridge ID (BID) , containing
+▪Bridge Priority
+▫Extended System ID (Optional )
+▪MAC Address (of sending switch)
+◦Switch with the lowest BID automatically becomes the Root Bridge
+After the Root Bridge elected
+BPDU(originated from the Root Bridge )contains the Root Bridge ID and Root Path 
+CostSW A
+SW B SW C
+Root Bridge
+FWD FWD
+RP RPDP
+--- PAGE 15 ---
+NYCUCS
+Root Path Cost
+15Recall: BPDU contains Root Path Cost
+When a switch receives a BPDU, 
+it calculates the Internal Root Path Cost of the ingress port
+◦Internal Root Path Cost = Root Path Cost (received) + port cost (ingress )
+Sum of individual port costs along the best path from the port to Root Bridge
+Default port cost defined by the port speed
+
+--- PAGE 16 ---
+NYCUCS
+Designated Port and Non-designated Port
+16Recall:Designated Ports selected on a Per-linkBasis
+port with the best route to the Root Bridge on a link 
+1)All ports on the Root Bridge are Designated Ports
+2)The other end of the Root Port is the Designated Port
+3)For any other link not including a Root Port,
+◦Selected on a Per-link Basis based on the Cost of BPDUs
+▪The port of the link with the lower Internal Root Path Cost is a Designated Port 
+▪The other end of the Designated Port is a Non-designated Port
+Root Ports and Designated Ports inForwarding State
+Non-designated Port inBlocking State
+◦Does not forward frames anddiscards frames received 
+◦Only listen to and process BPDUs (but does not send BPDUs)
+Disabled Port: administratively shut down , (not in STP and not forwarding frames)SW A
+SW BSW C
+Root Bridge
+DPDP
+RPRPDPDP
+DP
+DPRP
+RP
+Link not including 
+a Root Port
+--- PAGE 17 ---
+NYCUCS
+StateTransition in STP
+17When STP is enabled , every port is in a BlockingState
+◦Only listening to and processing BPDU, not sending/receiving user frames
+Switch Ports remains in a blocking state at election time
+Root Port or Designated Port move to a Listening State,
+◦All other ports remain in a Blocked State.
+Process user frames and update MAC address table 
+But does not forward user frames
+Forward user frames to the destination
+--- PAGE 18 ---
+NYCUCS
+Port States
+18
+
+--- PAGE 19 ---
+NYCUCS
+STP Modes
+19Several STP modes may exist in a switch
+Tree Calculation Convergence Resources Needed Standard Protocol
+All VLANs Slow Low 802.1D STP
+Per VLAN Slow High Cisco PVST+[1]
+All VLANs Fast Medium 802.1w RSTP
+Per VLAN Fast Very high Cisco Rapid PVST+
+Per Instance Fast Medium or high 802.1s MSTP[1] Cisco IOS use PVST+ as default mode
+•PVSP: Per-VLAN Spanning Tree 
+•RSTP: Rapid STP
+•Multiple Spanning Tree Protocol (MSTP)
+--- PAGE 20 ---
+NYCUCS
+Port States
+20STP (802.1D): Five port states
+RSTP (802.1W): Only three port states
+◦Merges 802.1D Disabled, Blocking, and Listening states 
+into a unique 802.1w Discarding state
+Port Learning 
+MAC Addresses?Port in Active 
+Topology?RSTP (802.1w) 
+Port StateSTP (802.1D) 
+Port State
+No No Discarding Disabled
+No No Discarding Blocking
+No Yes Discarding Listening
+Yes Yes Learning Learning
+Yes Yes Forwarding Forwarding

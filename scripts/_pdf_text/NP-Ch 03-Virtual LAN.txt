@@ -1,0 +1,577 @@
+--- PAGE 1 ---
+NYCUCS
+Professor Chien-Chao Tseng
+曾建超教授
+Department of Computer Science
+National Yang Ming Chiao Tung University
+cctseng@cs.nctu.edu.twVirtual LAN 
+1Virtual Local Area Network (VLAN)
+QinQ(IEEE 802.1ad)
+Virtual Extensible Local Area Network (VLAN (VXLAN)
+SIMPLIFIED: WHY EVPN/VXLAN? By Mike Bushong, Juniper
+Ethernet VPN/VXLAN
+--- PAGE 2 ---
+NYCUCS
+LAN, IP, MAC and ARP
+2
+--- PAGE 3 ---
+NYCUCS
+LAN and WAN
+Local Area Network (LAN)
+A networkthat interconnects computers within a limited area of a singlebroadcast 
+domain
+◦a residence, laboratory, office building, or campus 
+Wide Area Network (WAN)
+Networkthat extends over a large geographic area
+◦LAN Port:  of a switch, router or WiFiAP
+a socket that allows you to connect your device to a local network,
+◦WAN Port: of a switch, router or WiFiAP
+a socket that allow you to connect to the wider internet or other networks outside 
+of your local network. 
+3
+Router
+ Router
+WAN
+ LAN
+ LAN
+LANPort
+WANPort
+--- PAGE 4 ---
+NYCUCS
+Network Interface Card and MAC Address
+Machines need Network Interface Cards(NICs) to connect to networks.
+◦NIC aka Network/LAN Adapter, or Physical NW Interface
+Each NIC has a Media Access Control (MAC) Address
+MAC (aka LAN, Physical, or Ethernet) address:
+◦48 bits
+◦Locally unique on a LAN
+◦Flat address
+Portable: can move NICfrom one LAN to another
+Two machines on the same network
+◦Can physically communicate with each other directly with MAC addresses
+4
+LAN
+Data Link
+Physical
+--- PAGE 5 ---
+NYCUCS
+LAN, IP and MAC
+Host1 sends packets to Host2
+After Data Link layer encapsulation
+Need a mechanism to map Host2 IP to Host2 MAC
+5
+Internet
+(WAN)
+LANGateway
+R1Host2Host1
+Default Gateway 
+= R1TCP/IP 
+Data Link
+Transport
+Network 
+Physical
+Application 
+10.1.1.1/24
+XXXX:XXXX:XXXA
+10.1.1.2/24
+YYYY:YYYY:YYYB
+SrcIP: 10.1.1.1
+DstIP: 10.1.1.2
+TCP
+L2 Header
+L3 HeaderSrcMAC: XXXX:XXXX:XXXA
+DstMAC: YYYY:YYYY:YYYB
+SrcIP: 10.1.1.1
+DstIP: 10.1.1.2
+TCP
+L3 HeaderPacket Represented as:
+Data
+DataEncap
+--- PAGE 6 ---
+NYCUCS
+Address Resolution Protocol
+Address Resolution Protocol (ARP): 
+mapping Internetaddresses (IP) to physical addresses (MAC) 
+Each IP node (host, router) has ARP table(s) 
+◦One table for each interface associated with a network (LAN)
+ARP table: IP/MACmappings (for some nodes on the LAN)
+< IP address; MAC address; TTL>
+◦TTL(Time To Live): 
+time after which address mapping will be forgotten (typically 20 min)
+Soft State : 
+information that times out (goes away) unless refreshed
+6
+
+--- PAGE 7 ---
+NYCUCS
+ARP Message Format
+Used to resolve IP to MAC address mapping 
+Ethernet frame type: 
+◦080616for ARPmessages
+ARP Message Format:
+77
+Ethernet
+ARP
+Protocol Type Hardware Type
+Opcode Proto.Address L. HW Address L.
+Sender Hardware Address
+Sender Protocol Addr(bytes 1-2)
+Target Hardware AddressSender Protocol Addr(bytes 3-4)
+Target Protocol Address 
+--- PAGE 8 ---
+NYCUCS
+(2) TCP connection
+      Request (with IP) 
+(4) Find Next-hop(1) FTP
+TCPHostname
+IP addr
+(3) Segment
+ IP ARP
+Ethernet driverftp hostname
+Ethernet drTCP
+ARP ARP
+drIP
+(6) ARP Request (Ethernet broadcast) (7) ARP Reply (10) Frame(IP,TCP)(5) MAC  
+      Lookup 
+Resolver
+(8)MAC(9) IP(TCP)
+Host A
+Host BHost CFTP ServerProcedure of ARP: Host A runs “ftp B”
+E.g., Host A runs “ftp B”
+◦Assume ARP table of A
+does not have B’s MAC 
+8
+--- PAGE 9 ---
+NYCUCS
+Procedure of ARP: Host A runs “ftp B” (cont.)
+Assume A’s ARP table does not have B’s MACaddress
+A broadcasts ARP request , encapsulated in Ethernet frame
+‒Ethernet Header: containing 
+▪Source MAC:  A’s MAC
+▪Destination MAC: FF-FF-FF-FF-FF-FF
+‒ARP Request message: containing 
+▪Sender A’s MAC, A’s IP address
+▪Target B’s MAC all 0s , B's IP address, 
+All machines on the LAN receive ARP Request
+‒Breplies (unicast) to A with B's MAC address 
+A caches (saves) IP-to-MAC address pair in ARP Table
+ARP is “plug-and-play”:
+Create table automatically without intervention from administrator
+9
+
+--- PAGE 10 ---
+NYCUCS
+Virtual LAN (VLAN)
+10
+--- PAGE 11 ---
+NYCUCS
+Virtual LAN (VLAN)
+Local area network (LAN)
+acomputer networkthat interconnects computers within a limited area of a single
+broadcast domain .
+◦A residence, school, lab, campus, or office building.
+Virtual LAN(VLAN) 
+Abroadcast domainthat is partitionedand
+isolated in acomputer network 
+at thedata link layer
+(OSI layer 2).
+VLAN-enabled LAN isolation
+Network trafficthat is physically on a single network 
+but behaves as if it were splitbetween separate networks . 
+11
+Internet
+LAN
+VLAN 30
+VLAN 10
+VLAN 20
+
+--- PAGE 12 ---
+NYCUCS
+VLAN Usages
+VLANs provide a way to group devices within a LAN
+◦To communicate as if they were attached to the same cable
+▪via logical connections, instead of physical connections
+May segment networks based on
+▪Functions, 
+▪Project teams, 
+▪Applications, or
+▪…
+◦Without considering
+physical location of 
+users or devices
+12
+1st Floor
+2nd Floor
+3rd Floor
+•Reference: Cisco
+--- PAGE 13 ---
+NYCUCS
+IEEE 802.1Q VLAN
+IEEE 802.1Q, often referred to as Dot1q
+A networkingstandard that supportsvirtual LANs(VLANs) on anIEEE 
+802.3Ethernetnetwork. 
+Defines 
+◦A system ofVLAN tagging forEthernet frames and 
+◦Accompanying procedures to be used by bridgesorswitches in handling such 
+frames. 
+13
+--- PAGE 14 ---
+NYCUCS
+802.1Q VLAN Frame Format
+Extending Ethernet Frame Format for VLAN Trunk
+◦Adding a 4-byte field between sourceMAC and EtherType
+802.3 Ethernet Frame
+802.1Q Frame (See next slide)
+TPID: Tag Protocol Identifier, 2 Bytes; Value: 0x8100 (next slide)
+Tags: Tag Control Information,2 Bytes
+◦VLAN IDentificationNumber ( VID): 12 bits, up to 4096 VLAN IDs
+CRC: Cyclic Redundancy Check
+◦FCS: Frame Check Sequence (for Ethernet)
+14Recomputed CRC 
+(FCS for Ethernet) Dst.
+MACSrc.
+MACData 
+(Payload)CRC PreambleType/
+Length
+Type/
+LengthData 
+(payload) CRC’Dst.
+MACSrc.
+MACPreambleVLAN Tag
+TPID Tag
+--- PAGE 15 ---
+NYCUCS
+VLAN Tag Fields
+VLAN Tag Fields:
+◦Tag Protocol ID (TPID) : 2-byte value 
+▪Compliant with Ether type , Value of 802.1Q Header: 0x8100 
+◦Tag: 2-byte value 
+▪User Priority: 3-bit 
+▫Level or service implementation (like IP TOS)
+▪Canonical Format Identifier (CFI) : 1-bit 
+▫Identifier that enables Token Ring frames to be carried across Ethernet links
+▪VLAN ID (VID) :12-bit 
+▫VLAN identification number, up to 4096 VLAN IDs
+Switch inserts or removes VLAN Tag fields 
+◦Need to recalculate FCS/CRC values and insert new FCS into the frame
+▪FCS/CRC: Fault Check Sequence/Cyclic Redundant Code
+15
+Tag TPID
+--- PAGE 16 ---
+NYCUCS
+QinQ(IEEE 802.1ad )
+IncreasingnumberofusersinnetworksorVMsinDatacenter
+RequirealargenumberofVLANIDs.
+QinQ(alsoknownas StackingVLAN orDoubleVLAN )
+◦Encapsulatespacketswith twolayers ofVLANTags
+▪An802.11Qtaggedpacket isencapsulatedin another802.1Qtag
+◦toextendtheVLANnumbersupto4096 ×4096
+16typeDst.
+MACSrc.
+MACCRCType/
+Length
+typeDst.
+MACSrc.
+MACCRC’Type/
+LengthTPID
+2 BytesTag
+2 Bytes
+typeDst.
+MACSrc.
+MACCRC’’Type/
+LengthTPID
+2 BytesTag
+2 BytesTPID
+2 BytesTag
+2 BytesData 
+(payload)
+Data 
+(payload)Data 
+(Payload)
+--- PAGE 17 ---
+NYCUCS
+VLAN-aware Network 
+Networks that are IEEE 802.1Q Conformant 
+◦Can add or remove VLAN tags. 
+VLAN-aware network mustdistinguish each frame as being within exactly one 
+VLAN. 
+◦When a frame entersa VLAN-aware network, 
+the edge switch addsa tag to the frame, to represent the VLAN membership
+◦When a frame is leaving a VLAN-aware network, 
+the edge switch removes the tag on the frame
+17
+VLAN Tag
+No Tag No Tag
+VLAN-aware Network
+
+--- PAGE 18 ---
+NYCUCS
+Access Ports
+Access Port 
+◦A connection on a switch that transmits data to and from a specific VLAN .
+◦Only assigned to a single VLAN 
+▪When a host is plugged into the port it is in the VLAN
+◦Sends and receives frames that aren’t tagged 
+▪Drop a frame with VLAN tags
+18Access Ports
+VLAN 10
+VLAN 20
+Trunk Port
+VLAN 10
+VLAN 20
+
+--- PAGE 19 ---
+NYCUCS
+Trunk Ports
+Trunk Port 
+◦A connection on a switch that can transmit data from multiple VLANs
+▪A conduit for multiple VLANs between switches, routers, or servers. 
+◦Route traffic to and from multiple VLANs using a tagging protocol
+▪Allows for multiple VLANs to co-existon a single network. 
+▪Sends and receives frames that are tagged, in general
+◦Typically offer higher bandwidth and lower latency than access ports.
+19Trunk Ports
+VLAN 10
+VLAN 20Access Ports
+VLAN 10
+VLAN 20
+Access Port
+--- PAGE 20 ---
+NYCUCS
+Default VLAN (for Access Port)
+Only relevant on an Access port
+The VLAN to which all access ports are initially assigned 
+Switch sends and receives traffic without VLAN tags
+Default VLAN is VLAN 1, in general
+◦i.e., By default, Layer 2 Control Traffic is associated with VLAN 1
+E.g., 
+20
+Access Port
+Untagged VLAN 10VLAN 10
+Default VLAN 1
+Access PortsVLAN 1Trunk Port
+UntaggedTagged VID = 10
+--- PAGE 21 ---
+NYCUCS
+Native VLAN (on a Trunk)
+Used to define which VLAN will be untagged on a trunk (to interact with non-802.1Q)
+By default, trunk ports are in the Native VLAN
+Will not tag outgoing frames that belong to the Native VLAN
+Native VLAN = VLAN 1, by default, 
+◦but is changeable
+If receives a tagged frame with a VLAN ID = Native VLAN , dropsthe frame
+E.g., Native VLAN = VLAN 1
+If both sides of a link do not agree on Native VLAN, trunk will not operate properly
+21
+TrunkUntagged Untagged
+Untagged
+AccessVLAN 10
+Default VLANTrunkDoes not 
+speak 802.1Q
+VLAN 10 VLAN 10
+VLAN 1
+--- PAGE 22 ---
+NYCUCS
+Example of VLAN Trunk
+22
+Source: Cisco AcademyAccess Ports
+--- PAGE 23 ---
+NYCUCS
+Management VLAN and Switch Virtual Interface 
+Management VLAN 
+A VLAN configured to access the management capabilities of a switch
+By default, VLAN 1is the management VLAN
+◦But VLAN 1 is a bad choice because the default VLANis VLAN 1 too.
+▪Recommend assigning other VLAN IDs for the management VLANs
+Switch Virtual Interface (SVI)
+◦A logical layer-3 interface on a switch.
+◦Can be used to connect and manage the switch remotely
+Managing switch remotely: 
+◦Create an SVIfor the management VLAN 
+◦Assign an IP address and a subnet mask to the SVI
+Allowing the switch to be managed via HTTP, Telnet, SSH, or SNMP
+23
+--- PAGE 24 ---
+NYCUCS
+Inter-VLAN Routing
+24
+--- PAGE 25 ---
+NYCUCS
+What is Inter-VLAN Routing?
+VLANsdivide a LAN into multiple, separate broadcast domains
+Computers on separate VLANs are unable to communicate 
+(without the intervention of a routing device)
+Inter-VLAN routing
+◦forwarding network traffic from one VLANto another VLAN
+Recall: 
+Layer 2 switches cannot perform the dynamic routing function (of routers)
+Three inter-VLAN routing mechanisms :
+◦Legacy inter-VLAN routing
+◦Router-on-a-Stick
+◦Layer 3 switching via SVIs
+25
+--- PAGE 26 ---
+NYCUCS
+Legacy Inter-VLAN Routing
+Legacy inter -VLAN routing r elies onrouterswith multiple physical interfaces. 
+Eachrouter’s physical interface is connected to a uniqueVLAN .
+Configuration
+‒Connecting different physical router interfaces to different physical switch ports
+▪Each physical interface is assigned to a different VLAN
+▪Switch ports connected to the router are placed in access mode
+‒Each router interface can then 
+▪Accept traffic from the VLAN associated with the switch interface
+▪Route traffic to the other VLANs connected to the other interfaces
+26
+--- PAGE 27 ---
+NYCUCS
+Example of legacy inter-VLAN routing (1/2)
+Router R1 has a separate interface configured for each of VLANs.
+E.g., PC1 PC3
+◦PC1 on VLAN 10 
+◦PC3 on VLAN 30 
+◦Communicate
+through router R1.
+R!
+TrunkVLAN 10 (Access)
+VLAN 30 (Access) Trunk
+Trunk
+PC1 PC3 PC2VLAN 10
+VLAN 30
+VLAN 20S1 S3
+S2Access 
+Ports
+Access 
+Ports
+27
+--- PAGE 28 ---
+NYCUCS
+Example of legacy inter-VLAN routing (2/2)
+1.PC1 sends unicast traffic destined for PC3 to switch S2 on VLAN 10, 
+2.S2 forwards traffic out the trunk interface to S1.
+3.S1 forwards unicast traffic, through interface F0/3, to interface G0/0 on R1.
+4.R1 routes traffic, through interface G0/1, which is connected to VLAN 30.
+Unicast traffic forwarded to S1 on VLAN 30.
+5.S1 forwards the unicast traffic to S2 through the trunk link, 
+6.S2 can then forward the unicast traffic to PC3 on VLAN 30.
+Note:The router was configured with two separate physical interfaces to interact 
+with the different VLANs and performed the routing.
+Not efficient and is generally no longer implemented in switched networks . 
+28
+--- PAGE 29 ---
+NYCUCS
+Inter-VLAN Routing Router-on-a-Stick 
+Sub-interfaces:
+Software-based virtual interfaces , associated with a single physical interface
+◦Each sub-interface is independently configured with 
+▪A VLAN assignment and
+▪An IP address in the subnet corresponding to the VLAN assignment
+Router-on-a-stick : a type of router configuration utilizingsub-interfaces
+A single physical interface routes traffic between multiple VLANs on a network
+◦Configured to operate as a trunk link and
+◦Connected to a switch port in trunkmode
+Router accepts VLAN-tagged traffic on the trunk interface 
+Router internally routes traffic between VLANs using sub-interfaces
+◦VLAN-tagged for the destination VLAN and 
+◦Forward the traffic out the same physical interfaceTrunk
+SR
+29
+--- PAGE 30 ---
+NYCUCS
+Example of Router-on-a-Stick Inter-VLAN Routing
+PC1 on VLAN 10 communicating with PC3 on VLAN 30 
+◦Through R1 using a single, physical router interface.
+R1 G0/0: trunk, VLAN 10, 20, 30
+R!
+S1 S3
+S2
+VLAN 10
+VLAN 30
+VLAN 20TrunkTrunk
+TrunkTrunkSubinterfaces
+Access 
+Ports
+30
+--- PAGE 31 ---
+NYCUCS
+Example of Router-on-a-Stick Inter-VLAN Routing (2/2)
+1.PC1 sends its unicast traffic to switch S2.
+2.S2 tags unicast traffic with VLAN 10 and forwards traffic out its trunk link to S1.
+3.S1 forwards tagged traffic out the other trunk interface on port F0/3 to R1.
+4.R1 accepts tagged unicast traffic on VLAN 10 and 
+◦Routes traffic to VLAN 30  using its configured subinterfaces
+▪Tag unicast traffic with VLAN 30
+◦Sends tagged traffic out its interface to S1.
+5.S1 forwards the tagged unicast traffic out the other trunk link to S2.
+6.S2:
+◦Removes VLAN tag of unicast frame and 
+◦Forwards the frame out to PC3 on port F0/23.
+Note: can not scale beyond 50 VLANs
+31
+--- PAGE 32 ---
+NYCUCS
+Inter-VLAN Routing Multilayer Switching
+Router-on-a-Stick still requires a dedicated router.
+Amultilayer switch (MLS)is a networking devicethat 
+◦Switches framesonthe OSI layer 2 (like an ordinarynetwork switch)and 
+◦Provides extra functions on higherOSI layers . 
+Layer 3 Switches can perform Layer 2and Layer 3functions,
+◦May replace the dedicated routers to perform basic routing on a network. 
+Hardware-based switching can achieve high-packet processing rates
+◦Packet-switching throughputs
+▪Layer 3 switches : millionsof packets per second (pps), 
+▪Traditional routers : from 100,000ppsto more than 1 million pps
+32
+--- PAGE 33 ---
+NYCUCS
+Switch Virtual Interfaces
+Switch virtual interface (SVI)
+a virtual interface configured within a multilayer switch
+◦Can be created for any VLAN on the switch
+◦Is virtual because there is no physical port dedicated to the interface
+◦Can perform the same functions for the VLAN as a router interface would, and 
+◦Can be configured in 
+much the same way 
+as a router interface 
+▪IP address, 
+▪Inbound/Outbound ACLs,
+▪etc.
+
+--- PAGE 34 ---
+NYCUCS
+SVI as Default Gateway of VLAN
+An SVI served as the default gate for a VLAN 
+◦Provides Layer 3 processing for packets to or from 
+all switch ports associated with that VLAN
+Multilayer (L3) Switch routes traffic among VLANs
+VLAN 10VLAN 20VLAN 30
+VLAN 30
+VLAN 30VLAN 20
+SVI 20
+SVI 10SVI 30
+--- PAGE 35 ---
+NYCUCS
+Example ofInter-VLAN Routing Multilayer Switching (1/2)
+Deploying an L3 Switch, S1, for Inter-VLAN Routing 
+◦One SVI for each VLAN
+PC1 on VLAN 10 communicating with PC3 on VLAN 30 
+◦Through S1 using a single, physical switch interface
+VLAN 10VLAN 30
+PC 1PC 330
+VLAN 10L3
+TrunkTrunk
+Trunk
+S1Three SVIs
+--- PAGE 36 ---
+NYCUCS
+Example of Inter-VLAN Routing Multilayer Switching (2/2)
+1.PC1 sends its unicast traffic to switch S2.
+2.S2 tags unicast traffic with VLAN 10 and forwards traffic out its trunk link to S1.
+3.S1 removes VLAN tag and forwards traffic to VLAN 10 interface.
+4.S1 routes the traffic to its VLAN 30 interface.
+5.S1 retags the traffic with VLAN 30 and 
+forwards it out the trunk link back to S2.
+6.S2 removes VLAN tag of unicast frame 
+7.S2 forwards the frame out to PC3 
+on port F0/23
+

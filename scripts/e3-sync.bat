@@ -17,7 +17,7 @@ node "%PROJECT%\scripts\find-stubs.js" > "%STUBS%" 2>> "%LOG%"
 
 if %errorlevel% == 0 (
     echo [%date% %time%] Found stubs, calling Claude Code... >> "%LOG%"
-    type "%PROMPT%" | claude -p --allowedTools "Read,Write,Edit,Glob" >> "%LOG%" 2>&1
+    type "%PROMPT%" | claude -p --allowedTools "Read,Write,Edit,Glob,Bash" >> "%LOG%" 2>&1
     echo [%date% %time%] Notes generated. >> "%LOG%"
 ) else (
     echo [%date% %time%] No stubs to fill. >> "%LOG%"

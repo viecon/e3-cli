@@ -1,0 +1,1338 @@
+--- PAGE 1 ---
+NYCUCS
+Prof. Chien-Chao Tseng
+曾建超教授
+Department of Computer Science
+National Yang Ming Chiao Tung University
+cctseng@cs.nctu.edu.twComputer Network Basic and Linux 
+Networking
+Syllabus 1Reference: J. F. Kurose and K. W. Ross, Computer 
+Networking: A Top DownApproach
+--- PAGE 2 ---
+NYCUCS
+Agenda
+2Computer Networking Overview
+Network Interconnection and Packet Switching
+IP Addressing and Hop-by-Hop Forwarding
+IP Routing
+Network Address Translation
+Netfilter, Iptables, and Nftables
+Virtualization
+Secure Shell (SSH)
+--- PAGE 3 ---
+NYCUCS
+Internet: Interconnected Networks
+3Abstraction
+Internet: “network of networks ”
+Host Host
+Server
+User Agents
+Host
+Internet
+Server
+Peer-to-PeerHost
+Voice
+Message
+Message
+Voice
+User Agents
+--- PAGE 4 ---
+NYCUCS
+A Closer Look at Internet Structure
+41)Network Edge
+◦Hosts: clients and servers
+◦Servers may be in data centers
+2)Access Networks 
+Networks that connect end systems 
+to edge routers 
+Edge router: first router on a path 
+from a host to another remote host
+Physical media:
+wired, wireless communication links 
+3)Network Core
+Mesh of interconnected routers
+Network of networks
+Home 
+Network
+Global ISP
+Regional ISP
+L3
+Router
+Edge RouterMobile
+Network
+4G/5G
+L2 
+Switch
+Enterprise/Campus Network
+--- PAGE 5 ---
+NYCUCS
+ 5ISO Open Systems Interconnection (OSI) and Internet Models
+ISO: International Standards Organization
+◦ OSI: Open Systems Interconnection (OSI)
+Internet Protocol: Transport Control Protocol/Internet Protocol (TCP/IP)
+◦four software layers built upon hardware
+ISO OSI Internet (TCP/IP)
+Application 
+Application 
+Data Link
+Transport
+Network 
+Physical
+Session
+Presentation
+Data Link
+Transport
+Network 
+PhysicalLayer 7
+Layer 6
+Layer 5
+Layer 4
+Layer 3
+Layer 2
+Layer 1User Space
+Underlying NWsKernel
+Depends
+on App 
+Developer
+--- PAGE 6 ---
+NYCUCS
+1.Physical Layer –Transmits raw bit streams over a physical medium, like cables, 
+voltages, and connectors
+2.Data Link Layer –Provides node-to-node data transfer and error 
+detection/correction across the physical link
+3.Network Layer –Determines the best physical path for data and handles logical 
+addressing and routing (e.g., IP)
+4.Transport Layer –Ensures reliable end-to-end communication , through 
+segmentation, flow control, and error recovery (e.g., TCP/UDP)
+5.Session Layer –Manages and synchronizes dialogs or connections between 
+applications
+6.Presentation Layer –Translates, encrypts, and compresses data to ensure proper 
+formatand representation between systems.
+7.Application Layer –Provides network services directly to end-user applications such 
+as email, file transfer, and web browsing.
+6Functionalities of OSI Layers 
+Application Layer 
+--- PAGE 7 ---
+NYCUCS
+TCP/IP Protocol Stackand PDU
+7
+Data LinkNetworkTCP UDP
+IP
+RARPIGMPICMP
+ARPTransport SCTP
+PhysicalSessionPresentationApplication Applications
+SMTPFTPHTTPDNSSNMPTELNET
+Protocol Defined by 
+Underlying Networks •Segment
+•Datagram•Message
+•FrameHaD
+Hl
+HtHaDProtocol Data Unit (PDU)
+Hn
+HtHaD
+Hn
+HtHaDARPEncapsulation
+DecapsulationRARP
+Ha: Application Layer Header
+--- PAGE 8 ---
+NYCUCS
+Example Protocols of TCP/IP
+SMTP: Simple Mail Transfer Protocol
+FTP: File Transfer Protocol
+HTTP: Hypertext Transfer Protocol
+DNS: Domain Name System
+SNMP: Simple Network Management Protocol 
+SCTP: Stream Control Transmission Protocol
+TCP: Transmission Control Protocol
+UDP: User Datagram Protocol
+ICMP: Internet Control Message Protocol
+IGMP: Interne Group Management Protocol
+IP: Internet Protocol
+ARP: Address Resolution Protocol
+RARP: Reversed Address Resolution Protocol
+8
+--- PAGE 9 ---
+NYCUCS
+Key to Internet Success: Layers
+Applications
+…built on……built on……built on…
+…built on…Reliable (or unreliable) transport
+Best-effort global packet delivery
+Best-effort local packet delivery
+Physical transfer of bits
+--- PAGE 10 ---
+NYCUCS
+Data Link Layer: Provides node-to-node data transfer across the physical link.
+Network Layer Protocol (IP): Determines best route across the Internet, Hub-by-Hub
+Transport Layer Protocol: Provides End-to-End Communication
+Application Layer Protocol: Achieves Peer-to-Peer (Process-to-Process) 
+Communication
+Data Link
+Transport
+Network Application
+Physical
+Data Link
+Transport
+Network Application
+Physical
+10Layered Internet Protocol Model (Stack)
+Data Data•Process: running program
+Network (IP)Application 
+Transport (TCP/UDP)•TCP: Transmission Control Protocol
+•UDP: User Datagram Protocol
+ProcessProcessProcess ProcessProcessProcess
+Data Link(MAC)
+Destination SourceUser Space
+Kernel Space
+(OS)
+HardwareLogically End-to-End across the Internet
+--- PAGE 11 ---
+NYCUCS
+ 11How Application Works Client-Server Applications
+Internet Protocol (IP) Address :
+◦Host ID in Internet
+◦E.g., NYCU IPs = 140.113.xxx.yyy
+Mnemonic Names
+◦Domain Names
+▪www.nycu.edu.tw
+▪ftp.nycu.edu.tw
+Domain Name System 
+(DNS)
+◦Map the domain name 
+to the IP address
+Client-Server Applications
+InternetDomain Name System 
+(DNS)
+Domain Name IP
+User 
+Agents:
+Serverwww.nctu.edu.tw140.113.xxx.yyy
+Host
+③②
+④①
+user@nycu.edu.tw
+nycu.edu.tw
+https://www.nycu.edu.tw/
+User 
+Space
+Kernel 
+Space
+(OS)
+--- PAGE 12 ---
+NYCUCS
+How Application Works Peer to Peer
+12Peer-to-Peer Applications 
+◦Host connects/disconnects dynamically
+◦Hosts establisha data trunk with the server’sassistance
+Signaling Server 
+(Skype Directory)
+Invite
+Trunk (Data)OK
+Domain Name System 
+(DNS)
+aaa.bbb.
+ccc.ddd
+UA
+callee@skype.comcaller@skype.com
+skype.com
+(cctseng@gmail.com)
+--- PAGE 13 ---
+NYCUCS
+ 13Your Network Configuration
+Two Approaches
+◦Automatic Configuration
+▪via Dynamic Host Configuration Protocol (DHCP)
+◦Manual Configuration
+1.Internet Protocol (IP) Address : 32 bits
+▪E.g., 140.113.1 .10/24
+2.Subnet Mask
+◦Mask for extracting network address (NWID)
+▪E.g., 255.255.255.0
+3.Default Gateway: (140.113.1 .254)
+◦Forwarding node for unknown destinations
+4.Domain Name System (DNS) Servers
+◦Map domain names to IP addressesHost IDPrefix Length Network ID1.
+2.
+3.
+4.140.113.1.0 0000000(140.113.1.0/25)
+140.113.1.1 0000000 (140.113.1.128/25)
+255.255.255.1 0000000(/25)
+11111111.11111111.11111111.1 0000000 (/25)
+--- PAGE 14 ---
+NYCUCS
+IP DtagramHeader
+IP Datagram Format
+Total Length: 16 bits 
+◦limits datagram to at most 65535 bytes
+Protocol:  
+1 Internet Control Message Protocol (ICMP)
+6 Transmission Control Protocol (TCP)
+17User Datagram Protocol (UDP)
+Source IP Address: Sender’s IP
+Destination IP Address: Receiver’s IP
+14
+Data Link
+Transport
+Network 
+Application
+DataVers HL TOS Total length
+Identification Flags Fragment offset
+Time to live Header checksum
+IP Options (if any) Padding
+Data0        4         8                 16      19         24                   31
+.       .       .       .       .       .Destination IP addressSource IP addressProtocolProtocol
+--- PAGE 15 ---
+NYCUCS
+Ethernet Frame and TCP Segment Headers
+TCP Segment Header
+Port:
+◦80: HTTP
+◦443: HTTPS
+◦21: FTP Control
+◦20: FTP Data
+Ethernet  Frame 
+Header
+Type:
+◦080616: ARP
+◦080016: IP
+15Source Port Destination Port
+Acknowledgement Number
+Options (if any)0       4           10               16                   24                   31
+Sequence Number
+HLenRsvrdCode Bits Window Size
+Checksum Urgent Pointer
+Source AddressDestination Address
+Frame typePreamble
+Data Link
+Transport
+Network 
+Application
+Data
+Data Link
+Transport
+Network 
+Application
+DataPort Port
+--- PAGE 16 ---
+NYCUCS
+Incoming Packet Demultiplexing
+Demultiplexing a received Ethernet frame (packet)
+◦Decapsulatepacket as it goes up the protocol stack
+16Incoming Frame
+--- PAGE 17 ---
+NYCUCS
+Network Interconnection and Packet Switching
+17
+--- PAGE 18 ---
+NYCUCS
+LAN, WAN and Default Gateway
+18Local Area Network (LAN)
+A networkthat interconnects computers within a limited area 
+◦A residence, laboratory, office building, or campus
+Wide Area Network (WAN)
+A networkthat extends over a large geographic area
+Gateway
+A network node that serves as an access point to another network
+Default Gateway
+Forwarding node (router) in a networkfor an unknown destination
+◦Network nodes forward packets to the Default Gateway if no route entry matches 
+the destination IP address
+Internet 
+(WAN)
+LAN 
+LAN
+WAN
+Port LAN
+PortGateway
+R1
+Host2Host1Default Gateway 
+= R1
+
+--- PAGE 19 ---
+NYCUCS
+Network Interface Card and Connecting Devices
+Network Interface Card (NIC):connects hosts to the network
+◦aka Network Adapter, LAN Adapter, or Physical NW Interface
+◦Each has a unique Media Access Control (MAC, for local use) and an Internet 
+Protocol(IP, for global use) Address
+VariousConnecting Devices :operate in different layers
+Connect networks with one another
+◦Repeater (or hub): 
+▪Extends the range of a LAN 
+▪Receives a signal, removes noise, and regenerates signal to its original strength
+◦Bridge/Switch (or two-layer/L2 switch): 
+Connects deviceswithin the same LAN and
+forwards data based on MACaddresses
+◦Router (or three-layer/L3 switches) : 
+Interconnects networks and directs databetween them using IPs(later)
+19
+Data LinkNetwork
+PhysicalBridge or 2-Layer SwitchRouter or 3-Layer Switch
+Repeateror Hub
+Internet
+Router
+LAN
+LAN: Local Area NetworkNIC
+
+--- PAGE 20 ---
+NYCUCS
+Computers use Network Interface Cards(NICs) toconnect to networks.
+◦Aka Network Adapter, LAN Adapter, or Physical NW Interface 
+Each NIC has a Media Access Control (MAC) Address
+◦48-bit MAC address (for most LANs)
+▪Administered by IEEE
+◦Globally unique (Manufacturer buys portion of MAC address space)
+▪Burned in NIC ROM (sometimes software settable)
+◦Flat address
+Portable: can move the NICfrom one LAN to another
+Used for Local Delivery (on the same network)
+◦Can physically communicate with 
+one another directly with MAC
+20Network Interface Cardsand MAC Address
+LAN
+Switch
+Internet
+(WAN)
+IEEE: Institute of Electrical and Electronics Engineers
+RouterROM: Read Only Memory (Non-Volatile)
+Dst
+MACSrc
+MACData 
+(Payload)
+--- PAGE 21 ---
+NYCUCS
+Ethernet Switch
+A Link-layer Device:
+takes an activerole to store and forward Ethernet frames
+Examine incoming frameMAC address, 
+–Selectively forward  frame to one-or-more outgoing links 
+When attempt to forward frame on an Ethernet segment , 
+uses CSMA/CD to access the segment
+Transparent
+hosts are unaware of presence of switches
+Plug-and-play, Self-learning
+switches do not need to be configured
+CSMA/CD: Carrier Sense Multiple Access with Collision Detection
+21Bridge or 2-layer SwitchRouter or 3-layer Switch
+Repeateror Hub
+Source: AA
+B
+C1
+234Dest: C
+C  A
+D
+
+--- PAGE 22 ---
+NYCUCS
+Ethernet Frame Structure
+Preamble:7 bytes , to synchronize receiver, sender clock rates
+Addresses: 6 bytes
+Type:indicates higher layer protocol
+Mostly IP but others possible (e.g., Novell IPX, AppleTalk)
+–0x0800: IPv4, 0x0806: ARP
+CRC:checked at receiver, frame droppedif error detected
+Behavior of an adapter on receiving a frame with
+Matching Destination Address , 
+Broadcast Address (e.g., ARP packet), or
+Participating Multicast Address
+passesdata in frame to network layer protocol
+Otherwise, discardsframe
+22Dest.
+AddressSource
+AddressData 
+(Payload)CRC Preamble Type
+Data Link
+Transport
+Network 
+Application
+Data
+--- PAGE 23 ---
+NYCUCS
+Switch Table and Self-Learning
+Each switch has a switch table
+Table entry:
+MAC Address of Host, Interface to Reach Host, Time Stamp
+Looks like a routing table
+How does switch create and maintain table entries? 
+MAC Learning
+Self-learning which hosts can be reached through which interfaces
+When switch receives a frame, it
+–Learns location (port) of sender (incoming LAN segment)
+–Records Sender-MAC/Port pair in switch table
+23MAC Addr Interface     TTL
+Source: AA
+B
+C1
+234Dest: C
+C  A(1)
+D
+
+--- PAGE 24 ---
+NYCUCS
+Flooding, Forwarding and Self-learning (MAC Learning)
+Assume switch table is initially empty
+1)AC: 
+Destination C location unknown
+‒Flood
+MAC Learning
+–Update switch table 
+2)C A: 
+Destination A location known
+‒Unicast (Selectively send on just one link)
+MAC Learning
+–Update switch table 
+24MAC Addr Interface    TTL
+A 1 60
+C 3 60MAC Addr Interface   TTL
+A 160Source: AA
+B
+C1
+234Dest: C
+C  A
+A   C(1)
+(2)
+DMAC Addr Interface    TTL
+
+--- PAGE 25 ---
+NYCUCS
+Frame Filtering/Forwarding Algorithm
+Algorithm
+when  frame received at switch:
+1. record incoming link, MAC address of sending host
+2. index switch table using MAC destination address
+3. ifentry found for destination
+then {
+ifdestination on segment from which frame arrived
+thendrop frame
+elseforward frame on interface indicated by entry
+}
+elseflood /* forward on all interfaces except arriving
+interface */
+25Skip
+--- PAGE 26 ---
+NYCUCS
+Logical Layer 2 Loops
+Physical redundant paths may cause logical Layer 2 loops
+Due to switch MAC learning and forwarding (flooding) process
+Recall: Howswitches react to 
+Broadcast messages or 
+A unicast message with an unknown address 
+Forward frame out of every port, except the onereceives it 
+Three primary issues :
+1.Broadcast Storm
+2.MAC Database (address table) Instability 
+3.Multiple-frame transmission
+Solution:Spanning Tree Protocol (STP)
+Reference: https://www.youtube.com/watch?v=japdEY1UKe4
+Spanning Tree Protocol Explained | Step by Step, by CertBros
+26
+SW C
+SW B SW A
+A B
+--- PAGE 27 ---
+NYCUCS
+Spanning Tree Algorithm (STA)
+STA designates a single switch as Root Bridge
+used it as reference point for all path calculations
+Root Port (on a switch except Root Bridge )
+Port on a switch with best route to Root Bridge (in terms of path cost.) 
+Selected on a per-switch basis
+Designated Ports
+Port on a link (segment) with best route to Root Bridge
+Selected on a per-link basis
+27SW A
+SW B SW C
+Root Bridge
+DPDP
+RPRPDPDP
+DP
+DP
+DPRP
+RP
+RP
+--- PAGE 28 ---
+NYCUCS
+IP Addressing and Hop-by-Hop Forwarding
+28
+--- PAGE 29 ---
+NYCUCS
+Internet Protocol (IP): 
+Defines the rules for routinganddelivering data packets across interconnected 
+networks from a sourceto a destination
+Internet Protocol (IP) Addresses:
+◦Unique numerical identifier assigned to network devices
+▪More precisely, associated with the interfaces of hosts or routers 
+▪IPv4: 32 bits, IPv6: 128 bits
+◦For Global Delivery 
+(over the Internet)
+◦Hierarchical , not portable
+Hosts may have more than one interface
+Routers normally have multiple interfaces
+◦One (at least) for each connected network
+An interface may have more than one IP
+29Internet Protocol and IP Addresses
+Data Link(MAC)Internet Protocol(IP)
+Source DestinationSrcIP
+DstMAC SrcMACDstIP
+
+--- PAGE 30 ---
+NYCUCS
+Switches vs. Routers
+30Both are store-and-forward: 
+◦Routers: NW-layer devices, examine NW-layer headers
+◦Switches: Link-layer devices, examine link-layer headers
+Both have forwarding tables:
+◦Routers: compute forwarding tables, using routing algorithms , IP addresses
+◦Switches: learnforwarding table, using flooding, learning, MAC addresses 
+30
+RouterApplication 
+Data LinkTransport
+Network
+PhysicalData LinkNetwork
+PhysicalData Link
+PhysicalApplication 
+Data LinkTransport
+Network
+PhysicalEncapsulation
+Source
+ DestinationDecapsulation
+SwitchHtHnHlDHaHtHnDHaHtDHaDHa
+
+--- PAGE 31 ---
+NYCUCS
+IP Addressing
+Internet Protocol (IP) Address: Host address on the Internet
+◦IPv4 addresses: 32 bits, 
+IP address has two parts (Network ID, Host ID)
+◦E.g., 140.113.1 .10/24
+Hierarchical Addressing
+Matches the Network ID when forwarding packets
+◦140.113.xxx.yyy/16, 
+◦140.113.214.zzz/24
+Two special IP addresses (in each network)
+◦First IP: Network Number 
+▪e.g., 140.113.214.0/24, 140.113.215.0/25, 140.113.215.128/25
+◦Last IP: Broadcast IP (e.g., 140.113.214.255/24, 140.113.215.127/25)
+Broadcast Address: 255.255.255.255
+31CIDR:Classless Inter-Domain Routing
+140.113.0.0/16
+140.113.214 .0/24
+ 140.113.216 .0/24
+160.100.0.0/16160.100.21 .0/24
+140.113.215 .00…/26
+64~127
+140.113.215 .01…/260~63
+   .   .215.11…/26
+  .  .215.10…/26
+128~191192~255NYCU
+Host IDPrefix Length
+Network/Subnet  ID
+--- PAGE 32 ---
+NYCUCS
+Loopback Interface and Localhost
+Loopback 
+routing data back to their source without intentional processing or modification. 
+Loopback Interface
+avirtual network interfacethrough which applications on the same machine can 
+communicate with one another
+Traffic sent to a loopback IP address is simply and immediately passed back up 
+network software stack (as if received from another device)
+loorlo0: loopback interface name in Unix-likesystems 
+Most common IPv4 address used is 127.0.0.1
+Localhost :
+hostnamethat refers to current computer
+used to access network services running on the same host (vialoopbackinterface)
+32
+--- PAGE 33 ---
+NYCUCS
+Loopback Interface in Network Equipment
+A virtualinterface used for management purposes in network equipment 
+Management Interfaces
+Useful property of loopback Interfaces:
+Will not go down (unlike real physical interfaces) 
+Often used in the operation ofrouting protocols
+33Loopback
+BGP, 
+OSPF, 
+…BGP, 
+OSPF, 
+…
+--- PAGE 34 ---
+NYCUCS
+IP Datagram Forwarding
+Consult forwarding (routing) table to determine how to route an IP datagram
+Direct Forwarding: destination on the same physical network
+1.Finds physicaladdress of destination host (ARP)
+2.Encapsulates datagram in a physical frameand 
+3.Sends framedirectly to physical(MAC) address of destination host
+Indirect Forwarding: destination not on a directly 
+attached network
+1.Finds physicaladdress of next-hop router (ARP)
+2.Encapsulates datagram in physical frameand 
+3.Sends frameto physical(MAC) address of next-hop router
+Forwards IP datagrams hop-by-hop until can deliver datagrams directly.
+34ARP: address resolution protocol
+Router
+ RouterLAN LAN
+LAN
+Next-hopMAC: Media Access Control
+
+--- PAGE 35 ---
+NYCUCS
+Data Forwarding ‒ Two Hosts on a LAN
+Two hosts on the same LAN running FTP
+E.g., FTP client initiates FTPrequest 
+Client host deliver 
+framesdirectly to 
+server host
+35
+FTP
+Server
+Ethernet 
+DriverIPTCPFTP 
+ProtocolApplic
+-ation
+Tans-
+port
+Net-
+work
+LinkIP 
+Protocol
+Ethernet 
+ProtocolTCP 
+ProtocolFTP 
+client
+Ethernet 
+DriverIPTCPUser 
+Proc.
+Kernelhandles
+appl.
+details
+Handles
+Comm.
+Details
+Ethernet
+Host Host 
+LAN
+--- PAGE 36 ---
+NYCUCS
+Data Forwarding across Networks
+Networks connected with Routers
+Router has one interface for each networks
+36
+FTP
+Server
+TCP
+IP
+FTP
+Client
+TCP
+IP
+Ethernet
+Interface
+IP
+ IP
+Ethernet
+Interface
+Ethernet
+Interface
+ATM
+Interface
+ATM
+InterfaceHost Host
+Router RouterFTP Message
+TCP Segment
+IP Packet IP Packet IP Packet
+Ethernet frame Ethernet frame ATM FrameEthernet
+InterfaceHop-by-hop data delivery
+--- PAGE 37 ---
+NYCUCS
+Hop-by-hop Packet Forwarding
+Hop-by-Hop Forwarding and Encapsulation/Decapsulation
+37A
+L
+L
+LN
+LT
+LU
+DA
+H
+U
+DA
+HT
+H
+U
+DA
+HT
+HN
+HRouterA
+L
+L
+LN
+LT
+LU
+DA
+H
+U
+DA
+HT
+H
+U
+DA
+HT
+HN
+HL
+HRouter
+N
+LN
+L
+L
+LL
+LU
+DA
+HT
+HN
+H
+U
+DA
+HT
+HN
+HL
+HUser data User User
+Transmission Media Transmission MediaEncapsulation Decapsulation
+Data Link HD
+Transport HD
+Network HDApplicatioHD
+User Data
+--- PAGE 38 ---
+NYCUCS
+Encapsulation and Decapsulation
+Encapsulate packet when packet goes down the protocol stack
+De-capsulate packet when packet goes up the protocol stack
+38
+DL HD
+Trans HD
+NW HDApp HD
+Data
+User Data
+APP HD
+TCP HDIP HD TCP Data Eth HD Eth TLAPP Data
+TCP Segment
+IP Datagram
+Eethernet Frame
+Ethernet Data
+46 to 1500 bytesTCP HDIP HD TCP DataTCP HD TCP DataUser Data
+TCP Payload/ Data
+Ethernet Frame DataIP Payload/ DataSegment
+DatagramMessage
+FrameHaD
+Hl
+HtHaD
+Hn
+HtHaD
+Hn
+HtHaDEncapsulation
+DecapsulationD
+--- PAGE 39 ---
+NYCUCS
+Illustration of Hop-by-Hop Packet Forwarding
+Host S sends packet to host D
+IPs in Network Layer header not changed
+MACsin Link Layer header changed hop-by-hop
+Upper layer (Transport/Application) headers remain intact39S D R2
+IP_d
+MAC_dIP_r1-s
+MAC_r1-sIP_sIP_dMAC_r1-s
+MAC_s_MAC_r2-r1
+MAC_r1-r2
+IP_sIP_d
+IP_sIP_dMAC_d
+MAC_r2-d
+IP_s
+MAC_sIP_r1-r2
+MAC_r1-r2
+IP_r2-r1
+MAC_r2-r1IP_r2-d 
+MAC_r2-dR1Dst.
+Src.Dst.
+Src.L2
+L3
+Convention Presentation 
+of Internet Packet
+
+--- PAGE 40 ---
+NYCUCS
+IP Routing
+40
+--- PAGE 41 ---
+NYCUCS
+Two Main Functions of IP Layer
+1)Routing:control plane
+determines source-destination route
+for packets 
+Manual (static) configuration or 
+dynamicmethods 
+(Routing Algorithms)
+Slow time-scales 
+(per control event )
+2)Forwarding :data plane
+moves packets from routerinput  
+to appropriate router output
+Based on IP Destination Addresses
+Fast time-scales 
+(per-packet )
+41
+Routing Algorithm
+Forwarding Table
+IPDestination Out link
+Addr-Prefix 1
+Addr-Prefix 2
+Addr-Prefix 3
+Addr-Prefix 43
+2
+2
+1
+12
+3 IP Destination Address 
+(in packet header)Determines 
+end-end-route
+Determines 
+one-hop forwarding
+Longest Prefix 
+Matching
+
+--- PAGE 42 ---
+NYCUCS
+Inter-and Intra-Domain Routing
+42Internet is divided into Autonomous Systems (AS) 
+Autonomous System (AS): 
+a group of networks and routers under
+the authority of a single administration.
+Two Types of Routing Algorithms
+◦Intra-domain (AS) Routing :Routing inside an AS 
+Interior Gateway Protocol (IGP)
+◦Inter-domain (AS) Routing :Routing between ASs
+Exterior Gateway Protocol (EGP )
+•OSPF: Open Shortest Path First
+•IS-IS: Intermediate system to 
+intermediate system
+•RIP: Route Information Protocol
+•IGRP: Interior Gateway Routing 
+Protocol (Cisco)
+•EIGRP: Enhanced IGRP (Cisco)
+•BGP: Border Gateway Protocol
+12243
+3
+11
+25
+AB
+CD
+EZ
+--- PAGE 43 ---
+NYCUCS
+Routing, Forwarding and Routing Protocols
+Main functions of IP layer: 
+Routing and 
+Forwarding
+Routing Table:
+Routing Information Base
+Forwarding Table:
+Forwarding Information Base
+43
+OSPF Topology
+OSPF BGPBGP Table
+Routing Table
+Forwarding TableRouterRouter
+Router
+IP Destination Address
+--- PAGE 44 ---
+NYCUCS
+Routing Information Base (RIB)
+44Routing Information Base (RIB)
+◦also known as the RoutingTable
+◦A data table stored in a routeror a network host 
+▪List of the routes to particular network destinations, and 
+▪Routes normally have associated metrics (distances)
+Primary goal ofrouting protocolsis to construct routing tables dynamically
+◦Static routes:entries made in a routing table manually , fixed, not dynamic
+In general, RIB is not used directly forpacket forwarding
+◦RIB is designed for efficient exchange in routing protocols
+
+--- PAGE 45 ---
+NYCUCS
+Forwarding Information Base (FIB)
+45Forwarding Information Base (FIB) : 
+◦A simplerforwarding tablegenerated from RIBs 
+◦Contains only the routes chosen by routing algorithmsas preferred routes for 
+packet forwarding. 
+◦In a compressed or pre-compiled format optimizedfor storage andlookup .
+Separation of the control plane function (routing table) from 
+the forwarding plane function (forwarding table) 
+Uninterrupted high-performance forwarding.
+
+--- PAGE 46 ---
+NYCUCS
+Network Address Translation
+46
+--- PAGE 47 ---
+NYCUCS
+Public and Private IP Addresses
+Public IPs: Administered by Internet Assigned Numbers Authority (IANA)
+Globally unique, registered IP addresses, 
+Globally Routable
+Private IP Addresses
+Not Globally Delegated
+Used for intranets (private networks), 
+Three blocks of IP address space for private networks (RFC 1918)
+Cannot be transmitted onto the public Internet
+Need Network Address Translation (NAT)
+47
+Internet
+ Router/NAT
+140.113.24.1 192.168.1.1 192.168.1.3Local
+140.113.100.10Private IPPublic IP
+Classful Private Address Space Mask CIDRPrefix Block Size`
+1 A 10.0.0.0 – 10.255.255.255 255.0.0.0 10.0.0.0/8 24 bits
+16 B 172.16.0.0 –172.31.255.255 255.240.0.0 172.16.0.0/ 12 20-bits
+256 C 192.168.0.0 –192.168.255.255 255.255.0.0 192.168.0.0/ 16 16 bits
+172.0001 0000.255.255
+172.0001 1111.255.255172.1111 0000.255.255
+--- PAGE 48 ---
+NYCUCS
+What is Network Address Translation (NAT)?
+Network Address Translation 
+A method that maps IP addresses from one address realm to another
+NAT 
+Maps private addresses into globally routable ones and vice versus
+–Using private IP addresses and yet connecting to the Internet
+Internal network of an organization appears, from the outside,to be using a 
+different IP address space (than what it is actually using.) 
+48
+Internet
+ Router/NAT
+140.113.24.1 192.168.1.1 192.168.1.3Local
+Private IP Public IP
+140.113.100.10
+--- PAGE 49 ---
+NYCUCS
+Example: Multiple Co-existing Session Identification
+TCP is connection-oriented 
+–TCP Sessions identified by Five Tuples ( Dest. IP, Port|SourceIP, Port|Protocol)
+Application (Browser) provides Destination IP and Port
+OS provides Source IPand a unique Source Port
+UDP is connectionless, 
+UDP Sessions identified by Protocol and
+(DestIP,Destport)
+(on receiving host)
+49Destination Port Destination IP SourcePort Source IP Protocol
+443 140.113.43.18 53375 192.168.0.193TCP
+443 140.113.43.18 53509 192.168.0.193TCP
+443 180.222.102.158 55466 192.168.0.193TCP
+… … … …UDP
+140.113.43.18
+180.222.102.158
+
+--- PAGE 50 ---
+NYCUCS
+NAT Port Address Translation
+Assigns transport identifiers (ports) for connections
+Maps internal transport addresses (IP and port) to external transport addresses
+Records mapping and re-write transport addresses in IP headers 
+50
+Internet
+140.113
+.24.1192.168
+.1.1Local
+Router/NAT
+192.168
+.1.3
+140.113
+.100.10Dst140.113.24.1:4321
+Src140.113.100.10:22Dst140.113.100.10:22
+Src140.113.24.1:4321Dst140.113.100.10:22
+Src192.168.1.3:1234
+Dst192.168.1.3:1234
+Src140.113.100.10:22
+Internal External
+192.168.1.3:1234 140.113.24.1:4321(Inside) (Outside)
+140.113.24.1: 8765 192.168.1.3 :5678
+192.168.1.5:1234 140.113.24.1:9999
+192.168.1.5
+--- PAGE 51 ---
+NYCUCS
+How NAT/NAPT Works
+For outgoing datagrams: Source NAT (SNAT)
+Replaces (Sender IP , Port #) in Source Fields with (NAT IP, NAT Port # ),
+Remember mapping (in NAT translation table ): 
+(NAT IP, NAT port # ) (SenderIP address, Port # ) 
+Sendsreplaced datagram to remote host 
+Remote host replies with ( NAT IP, NAT Port # ) as Destination Transport 
+address
+For incoming datagrams: Destination NAT (DNAT)
+Replace(NAT IP address ,NAT Port # ) in Destination Fields
+with (SenderIP address, Port # ) stored in NAT table
+Note:
+SNATis performed after routing decision.
+DNATis performed before routing decision4-51
+
+--- PAGE 52 ---
+NYCUCS
+Port forwarding: application of DNAT
+Redirects a packet from one destinationtransport addressto another.
+May used to publish a service located in a private network
+NAT Translation Table:
+Internal External
+192.168.1.3: 80 140.113.24.1: 80
+192.168.1.3:21 140.113.24.1: 21
+192.168.1.5: 6000 140.113.24.1: 5060Port Forwarding
+52
+Web Server
+192.168.1.3: 80
+FTP Server
+192.168.1.4: 21
+Media Server
+192.168.1.5: 6000
+192.168.1.1 140.113.24.1140.113.24.1: 80
+140.113.24.1: 21
+140.113.24.1: 5060
+
+--- PAGE 53 ---
+NYCUCS
+Netfilter, Iptables, and Nftables
+53https://www.netfilter.org/
+https://devops-insider.mygraphql.com/zh-
+cn/latest/kernel/network/netfilter/ref/nftables_packet_flow_netfilter_hooks_detail.html
+--- PAGE 54 ---
+NYCUCS
+Netfilter
+54A Community-driven, collaborative FOSS project 
+A Linux kernel framework for packet filtering and mangling for Linux 2.4.x and later
+◦Provides hooksfor kernel modules to register callback functions at different 
+locations of the Linux network stack. 
+When packets traverse the respective hooks, the hooks call the registered callback 
+functions
+FOSS: Free and Open Source Software
+By Jan Engelhardt, File: Netfilter-packet-flow.svg-Wikimedia Commons
+--- PAGE 55 ---
+NYCUCS
+PREROUTING
+Triggered immediately when a packet enters the network stack, before the routing 
+decision (Ideal for Destination NAT; DNAT)
+INPUT:
+Triggered if the packet is destined for
+alocal processon the system
+FORWARD: 
+Triggered if the packet 
+is destined foranother host (the system acts as a router)
+OUTPUT: 
+Triggered for the packet generated locally by the system as it enters the stack
+POSTROUTING: 
+Triggeredafterthe routing decision and just before the packet is sent out
+(Ideal for Source NAT; SNAT)NetfilterHooks
+55Credited to: Hamed Enayatzare
+--- PAGE 56 ---
+NYCUCS
+Netfilterand Iptables/NftablesTools
+56Netfilteroperates in the kernel space, 
+Users interact with Netfilterthrough userspacetools:
+◦iptables: 
+▪Legacy utility 
+▪Uses a “Table and Chain” structure 
+to define rules
+▫Rule: action being performed on a packet
+◦nftables: 
+▪Modern successor to iptables
+▪Featuring a more efficient internal virtual machine and unified syntax
+◦conntrack: 
+▪A specialized tool for managing the Connection Tracking Table
+▪Allows for stateful firewallingUser SpaceIptables/nftables
+Kernel Space
+Netfilter
+Kernel ModulesNetlink
+--- PAGE 57 ---
+NYCUCS
+Netfilter, Iptables and Xtables
+57Netfilter(Engine): 
+◦A Linux kernel framework provides hooks for packet interception, filtering, and 
+manipulation (e.g., NAT, logging, dropping) for Linux 2.4.x and later
+Iptables: 
+◦User-space command-line utility 
+Used to define the rulesthat 
+the Netfilterframework executes
+◦Commonly refers to 
+iptables (IPv4), ip6tables (IPv6), arptables(ARP), and ebtables(Ethernet bridging)
+Xtables: 
+◦The shared architecture of the common code and library system used by Iptables
+▪Manages rule tables (Filter, NAT, Mangle) for IPv4, IPv6, ARP, and Ether frames
+Note: iptables commonly inclusively refers to the Xtablesand Netfilteras wellKernel Module Protocol / Layer User Space Tool
+ip_tables IPv4 (Layer 3) iptables
+ip6_tables IPv6 (Layer 3) ip6tables
+arp_tables ARP (Address Resolution) arptables
+eb_tables Ethernet Bridge (Layer 2) ebtables
+--- PAGE 58 ---
+NYCUCS
+Xtablesprovides different kernel modules for different protocols
+Xtables(x_tables)Hierarchy of Netfilter/Xtables/Iptables Stack
+58Role Level Component
+Commands you type in the terminal to configure the kernel modules. User-space Tools iptables, etc.
+Specific modules that register with Netfilterhooks for a certain protocol Protocol Modules ip_tables.ko, etc.
+Shared code for the table/chain/rule architecture Intermediate Layer Xtables(x_tables.ko)
+Provides the kernel hooks (INPUT, FORWARD, etc.). Base Framework NetfilterUser Space
+Kernel SpaceNetlink/ System Callsiptables ebtables arptables Applications ip6tables
+Netfilterip_tables ip6_tables arp_tables eb_tables Kernel Modules
+--- PAGE 59 ---
+NYCUCS
+Tables and Chains 
+Filters are organized in a set of tables
+Xtablesmanages tables and chains, and executes rules configured by Iptables
+Tables: Containers for rules being performed on a packet
+◦Filter: packet filtering, default table
+◦NAT: NAT operation
+◦Mangle: add tag on packet (for QoS or load distribution)
+◦Raw: mainly for exemptions from connection tracking
+Predefined Chains: checkpoints in the network stack where packets are processed
+(Mapping to the five available Netfilterhooks)
+◦PREROUTING : for packets before a routing decision is made.
+◦INPUT: for packets destined to local sockets
+◦FORWARD : for packets being routed through the machine.
+◦OUTPUT: for locally-generated packets.
+◦POSTROUTING : for packets about to go out after Routing decision has been made. 
+59
+--- PAGE 60 ---
+NYCUCS
+Chains, Tables, and Packet Flow
+60mangle
+PREROUTINnat
+PREROUTINmangle
+INPUTfilter
+INPUTlocal 
+process
+nat
+OUTPUT
+filter
+OUTPUT
+mangle
+POSROUTING
+nat
+POSROUTINGmangle
+FORWARDfilter
+FORWARD
+reroute
+checkRouting
+decisionRouting
+decisionmangle
+OUTPUT
+FORWARD
+PREROUTINGINPUTOUTPUT
+POSTROUTING
+--- PAGE 61 ---
+NYCUCS
+Modern packet-filtering framework for Linux 3.13 and later
+◦Replaces and abstracts the legacy Xtablestools with NftablesAddress Families
+▪XtablesTools: iptables, ip6tables, arptables, and ebtables:
+▪NftablesAddress Families: ip, ip6, inet(for both IPv4 and IPv6), arp, bridge, 
+netdev
+No default tables or chains, starting with a “blank slate”
+iptables-nft translator provides compatibility
+Converts iptables commands into nftablesinstructionsNfTables
+61
+nft(ip, ip6, inet, arp, bridge, netdev) User Space
+Kernel Space
+ntablesKernel ModulesNetlink/ System Calls
+Netfilter•iptables-nft . This is a "translation layer" that lets you type old iptablescommands while the system secretly converts them into nftablesinstructions in the background.Quick Comparison
+Do you need help migrating your current rules or looking for a specific configuration example?
+--- PAGE 62 ---
+NYCUCS
+Key Features and Advantages of Nftables
+62Unified Toolset: a single command-line tool, nft, with different families
+Enhanced Performance: achieve O(1) complexity by using 
+◦A Berkeley Packet Filter (BPF)-like virtual machine and 
+◦Optimized data structures (sets and maps)
+Atomic Updates: 
+◦Rules can be updated as a single transaction 
+Ensure firewall consistency without temporary gaps during configuration changes
+Cleaner Syntax: 
+◦Offers a more intuitive, tcpdump-inspired syntax 
+◦Allows multiple actions in a single rule 
+Advanced Debugging: 
+◦Easier to troubleshoot complex configurations 
+◦Includes built-in support for rule tracing (nftrace) and monitoring
+--- PAGE 63 ---
+NYCUCS
+Mostly the same as the
+legacyiptables. 
+Only the packet 
+classification framework
+is new.NftablesPacket Classification and Packet Flow
+63
+IP
+ARP
+No
+Yes
+YesNo
+Local?Yes
+Local?No
+IP Layer
+IP Layer
+Application Layer
+Bridge Layer
+ARP Layer
+--- PAGE 64 ---
+NYCUCS
+Supplementaries
+64
+--- PAGE 65 ---
+NYCUCS
+Virtual Machine
+65A virtual machine is a software computer that, like a physical computer, runs an 
+operating system and applications
+Host OSHypervisor
+HardwareAPPAPP APPAPP
+OSPhysical Machine Virtual Machines
+Virtualization VM
+Guest OSVM
+Guest OS
+HardwareAPPAPP
+--- PAGE 66 ---
+NYCUCS
+VirtualBox and Networking Modes
+66By Oracle
+Networking Modes
+◦Not attached
+◦Network Address 
+Translation (NAT)
+▪Default Mode
+◦NAT Network
+◦Bridged networking
+◦Internal networking
+◦Host-only networking
+◦Cloud networking
+◦Generic networking
+Guest
+VM1Guest
+VM2
+NATVirtualBox
+NATPhysical Host
+Internet
+10.0.0.2/2410.0.0.15/24
+Physical
+NIC10.0.0.2/2410.0.0.15/24
+10.10.10.78/2410.10.10.1
+/24
+--- PAGE 67 ---
+NYCUCS
+Secure Shell (SSH) Service
+67Secret File Transfer Protocol (FTP)
+◦Control: Port 21
+◦Data: Port 20
+Secure File Transfer Protocol (SFTP)
+◦Based on SSH
+◦Port 22
+▪For both control and dataSSH Server SSHClient
+TCP SYN (22)
+SSH Connection Start
+SSH Server Key Verify 
+ServerUsername/Password Verify 
+ClientSSH Connection Handshakes…TCP SYNACK
+TCP ACKThree-Way
+Handshake

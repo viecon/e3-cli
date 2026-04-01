@@ -1,0 +1,828 @@
+--- PAGE 1 ---
+1
+1
+Lab2. IOS & Packet Tracer 
+網路規劃管理與實務 - CCNA 2026 Spring 
+Authors: 
+陳芷桓 <czh@it.cs.nycu.edu.tw> 
+Credit to 施羿廷（ytshih） 
+--- PAGE 2 ---
+2
+2Outline 
+●Network Device Introduction 
+●Packet Tracer Introduction & Installation 
+●IOS Introduction 
+●Basic Setting of Switch 
+●Functions of Packet Tracer 
+●Try the Real Switch 
+--- PAGE 3 ---
+3
+3Outline 
+●Network Device Introduction 
+●Packet Tracer Introduction & Installation 
+●IOS Introduction 
+●Basic Setting of Switch 
+●Functions of Packet Tracer 
+●Try the Real Switch 
+--- PAGE 4 ---
+4
+4
+4What is a Switch 
+●Con bines  multiple computers into a LAN
+●Operate at Data Link Layer (L2) 
+●Designed with multiple ports (usually more than 24 ports) 
+
+--- PAGE 5 ---
+5
+5
+5
+What is a Router 
+●Connect two or more logical subnets together 
+●Operate at Network Layer (L3) 
+
+--- PAGE 6 ---
+6
+6
+6
+What is a Layer 3 Switch 
+●Focus on vlan and simple IGP(Interior gateway protocol) funtionality 
+●Operate at both Data Link Layer (L2) and Network Layer (L3) 
+
+--- PAGE 7 ---
+7
+7
+7Simple Switch and Router topology 
+Switch L3 Switch Router 
+--- PAGE 8 ---
+8
+8
+8Scenario 
+●You are a newbie network administrator, and you found 3 switches. 
+●You have to manage the network of the school. 
+○ 3 PC rooms, 2 PCs each. 
+○ The PCs should be able to connect to each other. 
+--- PAGE 9 ---
+9
+9Lab 2 Scenario 
+
+--- PAGE 10 ---
+10
+10Outline 
+●Network Device Introduction 
+●Packet Tracer Introduction & Installation 
+●IOS Introduction 
+●Basic Setting of Switch 
+●Functions of Packet Tracer 
+●Try the Real Switch 
+--- PAGE 11 ---
+11
+11
+11What is Cisco Packet Tracer? 
+●Networking technology teaching and learning software developed by Cisco 
+Networking Academy 
+●Create virtual networks and experiment on them 
+●Allow instructors to easily teach and demonstrate complex technical concepts 
+and networking systems design 
+--- PAGE 12 ---
+12
+12
+12Download Packet Tracer 
+●You need an account to download Cisco Packet Tracer. 
+●Click top-right icon to sign-up. 
+https://skillsforall.com/resources/lab-downloads 
+--- PAGE 13 ---
+13
+13
+13Download Packet Tracer 
+●Fill-in your own information to create an account. 
+●Please remember your password, you may need it for on-site midterm exam. 
+
+--- PAGE 14 ---
+14
+14
+14Download Packet Tracer 
+●Current version is 8.2.2. 
+●Using any version earlier 
+than this might cause 
+problems to your homework 
+project. 
+
+--- PAGE 15 ---
+15
+15
+15
+What is Cisco Packet Tracer? 
+--- PAGE 16 ---
+16
+16Outline 
+●Network Device Introduction 
+●Packet Tracer Introduction & Installation 
+●IOS Introduction 
+●Basic Setting of Switch 
+●Functions of Packet Tracer 
+●Try the Real Switch 
+--- PAGE 17 ---
+17
+17
+17Purpose of IOS 
+●A CLI-based network operating system on a switch or router that enables an 
+user to: 
+○Run CLI-based network programs 
+○View output on a monitor 
+●Cisco networking devices run particular versions of the Cisco IOS 
+○The IOS version is dependent on the type of device being used and the required features 
+○It’s possible to upgrade the IOS version or feature set to obtain additional capabilities. 
+
+--- PAGE 18 ---
+18
+18
+18IOS - User Levels and Command Modes 
+Privileged EXEC Mode 
+VTY Console User EXEC Mode Global Configuration Mode Line 
+Configuration 
+Mode Interface 
+Configuration 
+Mode Other 
+Configuration 
+Modes 
+User EXEC Level Privileged EXEC Level 
+Reference: https://www.cisco.com/E-Learning/bulk/public/tac/cim/cib/using_cisco_ios_software/02_cisco_ios_hierarchy.htm 
+--- PAGE 19 ---
+19
+19
+19IOS - User Levels 
+As a security feature, the Cisco IOS software separates management access  
+into the following two primary command modes: 
+●User EXEC Level 
+○It allows only a limited number of basic monitoring commands 
+○Any commands that might change the configuration is not allowed 
+○The user EXEC mode  is identified by the CLI prompt that ends with >
+●Privileged EXEC Level  
+○ You can access all the command modes .
+○The privileged EXEC mode  is identified by the prompt ending with # 
+--- PAGE 20 ---
+20
+20
+20IOS - Conﬁguration Command Modes 
+●To configure the device, the user must enter  Global Configuration Mode , 
+which is commonly called global config mode 
+●From global conﬁg mode , configuration changes are made globally 
+○ Global conﬁguration mode  is identified by a prompt that ends with (config)# 
+○ i.e. Switch(config)# 
+●From global conﬁg mode, the user can enter diﬀerent sub-conﬁguration 
+modes 
+○ Sub-conﬁguration modes  allows the conﬁguration of a particular part 
+○ Two common sub-conﬁguration modes include: 
+■ Line Conﬁguration Mode  - Used to conﬁgure console, SSH, Telnet access. 
+■ Interface Conﬁguration Mode  - Used to conﬁgure a switch port or router network 
+interface. 
+--- PAGE 21 ---
+21
+21
+21switch> enable 
+switch# disable 
+switch> 
+Move between Privileged EXEC Mode  and Global Configuration Mode 
+switch# configure terminal 
+switch(config)# exit 
+switch# Navigate Between IOS Modes 
+Move between User EXEC  Mode  and Privileged EXEC  Mode 
+
+--- PAGE 22 ---
+22
+22
+22switch(config-line)# end
+switch# 
+From one sub-configuration mode to another can be moved directly 
+switch(config-line)# interface vlan  1
+switch(config-if)# 
+Navigate Between IOS Modes 
+Move from any sub-configuration mode  to Privileged EXEC mode 
+switch(config-line)# Ctrl+Z 
+switch# 
+--- PAGE 23 ---
+23
+23
+23switch(config-line)# exit 
+switch(config)# 
+switch(config)# exit 
+switch# 
+Navigate Between IOS Modes 
+exit can be used to move from any mode to its parent mode. 
+switch(config-if)# exit 
+switch(config)# 
+switch# exit 
+switch con0 is now available 
+press RETURN to get started. 
+
+--- PAGE 24 ---
+24
+24Outline 
+●Network Device Introduction 
+●Packet Tracer Introduction & Installation 
+●IOS Introduction 
+●Basic Setting of Switch 
+●Functions of Packet Tracer 
+●Try the Real Switch 
+--- PAGE 25 ---
+25
+25
+25Basic IOS Command Structure 
+●Each IOS command has a specific format or syntax and can only be executed 
+in the appropriate mode 
+●The general syntax for a command is the command followed by any 
+appropriate keywords and arguments. 
+○Keyword - a specific parameter defined in the operating system (in the figure, ip protocols) 
+○Argument - a value or variable defined by the user (in the figure, 192.168.10.5 )
+
+--- PAGE 26 ---
+26
+26
+26Basic Conﬁguration for Switch 
+●Generally speaking, your switch will work out of the box with no conﬁguration. 
+●However, it will do nothing other than making your devices to be able to access each 
+other. 
+○ Some other conﬁgurations might be needed to provide basic protection. 
+conventions 
+Bold type exactly as shown. 
+Italic replace with appropriate argument. 
+[brackets] any or all arguments within [ ] are optional. 
+{braces} all arguments within { } are necessary. 
+--- PAGE 27 ---
+27
+27
+27IOS - Commands and Shortening 
+●Commands and keywords can be shortened to the minimum number of 
+characters that identify a unique selection 
+○The configure  command can be shortened to conf  because configure is the only command 
+that begins with conf . 
+■An even shorter version of con will not work because more than one command begins 
+with con 
+○ The terminal  keyword can be shortened to t because terminal is the only keyword 
+available in command conﬁgure. 
+switch# conf t 
+switch(config)# 
+switch# con t 
+% Ambiguous command: “con t” 
+--- PAGE 28 ---
+28
+28
+28IOS - Hotkeys 
+? List available commands 
+Tab Autocomplete & Check if the current command viable 
+Ctrl + Z Return to Privileged EXEC Mode 
+Ctrl + Shift + 6 Cancel Cisco IOS Process 
+Up Arrow / Down Arrow Allows user to scroll through former commands. 
+--- PAGE 29 ---
+29
+29
+29Save the Running Conﬁguration File 
+●There are two system files that store the device configuration: 
+○startup-config 
+■Stored in Non-volatile Random Access Memory (NVRAM) 
+■Contains all of the commands that will be used by the device upon reboot 
+■NVRAM does not lose its contents when the device is powered off or restarted 
+○running-config   
+■Stored in Random Access Memory (RAM) 
+■Modifying a running configuration affects the operation of a Cisco device immediately 
+■It loses all of its content when the device is powered off or restarted 
+●To save changes made to the running configuration to the startup 
+configuration file use the copy running-config startup-config  privileged 
+EXEC mode command 
+switch# copy running-config startup-config 
+--- PAGE 30 ---
+30
+30
+30Conﬁgure Hostnames 
+Edit hostname 
+switch# configure terminal 
+switch(config)# hostname SW-EC1f 
+SW-EC1f(config)# 
+●Remember to save in Privileged EXEC Mode after 
+conﬁguring. 
+●Add no in front of any command will remove that 
+command. 
+○e.g. switch(config)# no hostname SW-EC1f 
+--- PAGE 31 ---
+31
+31
+31Secure Device Access 
+●Cisco IOS can be conﬁgured to use hierarchical mode passwords to allow 
+diﬀerent access privileges to a network device 
+○Console Access password 
+■ Password for Switch console port access 
+○Privileged EXEC Access password 
+■ enable password for entering Privileged EXEC from User EXEC Mode 
+●Other tasks 
+○Encrypt all passwords 
+○Provide legal notification 
+--- PAGE 32 ---
+32
+32
+32Conﬁgure Passwords 
+Privileged EXEC Access password 
+SW-EC1f(config)# enable password passwd2 Console Access password 
+SW-EC1f(config)# line console 0 
+SW-EC1f(config-line)# password passwd1 
+SW-EC1f(config-line)# login 
+SW-EC1f(config-line)# exit 
+SW-EC1f(config)# Modify console 
+Enter the Line Conﬁguration Mode 
+--- PAGE 33 ---
+33
+33
+33Encrypt Passwords 
+●The startup-config and running-config files display password  in plaintext 
+○This is a security threat since anyone can see the passwords used if they have access to 
+these files. 
+●To encrypt passwords, use the  service password-encryption  global config 
+command 
+○The command applies weak encryption (Vigenère cipher)  to all unencrypted passwords 
+○This encryption applies only to passwords in the configuration file, not to passwords as they 
+are sent over the network 
+○The purpose of this command is to keep unauthorized individuals from viewing passwords in 
+the configuration file. 
+○It cannot provide any security at all 
+SW-EC1f(config)# service password-encryption 
+--- PAGE 34 ---
+34
+34
+34Conﬁgure Users and their Secrets 
+●Create a user and set its secret 
+○Secret is same with password 
+○But it stores the result of MD5 hash function instead 
+SW-EC1f(config)# enable secret passwd4 SW-EC1f(config)# username user secret passwd3 
+SW-EC1f(config)# line console 0 
+SW-EC1f(config-line)# login local 
+SW-EC1f(config-line)# exit 
+SW-EC1f(config)# 
+--- PAGE 35 ---
+35
+35
+35Banner Messages 
+Although requiring passwords is one way to keep unauthorized personnel out of a 
+network, it is vital to provide a method for declaring that only authorized personnel 
+should attempt to gain entry into the device 
+SW-EC1f(config)# banner motd !
+helloworld hellloflvksdflsdk! 
+SW-EC1f(config)# 
+The Delimiter can be any character, being used to mark the start and end of 
+message. 
+--- PAGE 36 ---
+36
+36
+36Verify and Monitor Solution 
+●The Cisco IOS show commands are some of the most useful troubleshooting and 
+verification tools included the Cisco IOS 
+○ Taking advantage of a large variety of options and sub-options, the show command can be used to narrow 
+down and display information about practically any specific aspect of IOS 
+SW-EC1f# show running-config  
+SW-EC1f# show statup-config  
+SW-EC1f# show interfaces  
+SW-EC1f# show arp  
+SW-EC1f# show version 
+
+--- PAGE 37 ---
+37
+37
+37Command Output Redirection 
+●The output of a show command can be ﬁltered or redirected to a ﬁle. 
+●Redirection is available using a pipe (|)  character after any show 
+command , combined with the following keywords: 
+begin Begins unfiltered output of the show command with the first line that 
+contains the regular expression. 
+exclude Displays output lines that do not contain the regular expression. 
+include Displays output lines that contain the regular expression. 
+section Filter a section of output 
+--- PAGE 38 ---
+38
+38
+38Command Output Redirection - Examples 
+Switch# show running-config | section username 
+username ccna secret 5 $1$mERr$Bok4KDfVutXOJolNq009M/ 
+Switch# show running-config | section line 
+line con 0 
+  login local 
+line vty 0 4 
+  login 
+line vty 5 15 
+  login 
+end
+Switch# 
+
+--- PAGE 39 ---
+39
+39
+39Cisco Discovery Protocol (CDP) 
+●A Cisco proprietary protocol 
+●Collect directly connected neighbor device information 
+○ hardware, software, device name, … 
+●Show all neighbors 
+Sw-Lab1# show cdp neighbors 
+●Show details of one neighbor 
+Sw-Lab1# show cdp entry Device-ID 
+--- PAGE 40 ---
+40
+40
+40Cisco Discovery Protocol (CDP) 
+●Disable CDP globally 
+Sw-Lab1(config)# no cdp run 
+●Disable CDP for an interface 
+Sw-Lab1(config)# interface fastEthernet 0/1 
+Sw-Lab1(config-if)# no cdp enable 
+--- PAGE 41 ---
+41
+41
+41Link Layer Discovery Protocol (LLDP) 
+●IEEE standard protocol 
+●Similar to CDP 
+●Not enabled by default 
+Sw-Lab1(config)# lldp run 
+or
+Sw-Lab1(config)# interface fastEthernet 0/1 
+Sw-Lab1(config-if)# lldp receive 
+Sw-Lab1(config-if)# lldp transmit 
+--- PAGE 42 ---
+42
+42
+42Link Layer Discovery Protocol (LLDP) 
+●Show lldp neighbors 
+Sw-Lab1# show lldp neighbors 
+--- PAGE 43 ---
+43
+43
+43Command Review 
+switch> enable 
+switch# conf term 
+switch(config)# hostname SW-EC1f 
+SW-EC1f(config)# enable secret passwd1 
+SW-EC1f(config)# username user secret passwd2 
+SW-EC1f(config)# line console 0 
+SW-EC1f(config-line)# login local 
+SW-EC1f(config-line)# exit 
+SW-EC1f(config)# banner motd !
+helloworld hellloflvksdflsdk! 
+SW-EC1f(config)# exit 
+SW-EC1f# cop runn start  
+
+--- PAGE 44 ---
+44
+44Outline 
+●Network Device Introduction 
+●Packet Tracer Introduction & Installation 
+●IOS Introduction 
+●Basic Setting of Switch 
+●Functions of Packet Tracer 
+●Try the Real Switch 
+--- PAGE 45 ---
+45
+45
+45Packet Tracer Functions - Console 
+
+--- PAGE 46 ---
+46
+46
+46Lab3 Scenario Recap 
+
+--- PAGE 47 ---
+47
+47
+47Lab3 Solution 
+
+--- PAGE 48 ---
+48
+48
+48Packet Tracer Functions - Simulation 
+●Visualize the network traﬃc 
+
+--- PAGE 49 ---
+49
+49
+49Packet Tracer Functions - Protocol Data Unit 
+●Send a Protocol Data Unit (PDU) for test 
+
+--- PAGE 50 ---
+50
+50
+50Lab Requirement 
+●Banner message should be set to  This lab is too ez! 
+●There should be hostname on each switch. 
+○EC324-sw 
+○EC315-sw 
+○EC316-sw 
+●Password class  should be required for entering user EXEC mode. 
+○ Encrypted using weak encryption. 
+●Password nycu  should be required for entering privileged EXEC mode. 
+○ Encrypted using MD5 
+●There should be a distinct IP on each PC, and is able to ping each other. 
+○ EC324: 192.168.1.1/16 - 192.168.1.2/16 
+○ EC315: 192.168.2.1/16 - 192.168.2.2/16 
+○ EC316: 192.168.3.1/16  - 192.168.3.5/16 
+
+--- PAGE 51 ---
+51
+51Outline 
+●Network Device Introduction 
+●Packet Tracer Introduction & Installation 
+●IOS Introduction 
+●Basic Setting of Switch 
+●Functions of Packet Tracer 
+●Try the Real Switch 
+--- PAGE 52 ---
+52
+52
+52網路線 
+
+--- PAGE 53 ---
+53
+53
+53網路線 
+
+--- PAGE 54 ---
+54
+54
+54光纖線路 
+SC to SC SC to LC LC to LC 
+--- PAGE 55 ---
+55
+55
+55光纖模組 
+SFP BiDi SFP QSFP to 4xSFP 
+(Breakout) QSFP 
+
+--- PAGE 56 ---
+56
+56
+56Try the Real Switch 
+console 
+--- PAGE 57 ---
+57
+57
+57Try the Real Switch - Console 
+
+--- PAGE 58 ---
+58
+58
+58Try the Real Switch - Console 
+
+--- PAGE 59 ---
+59
+59
+59How to Access a Switch - Console 
+●Directly connect  the ethernet cable to the console port  on the switch. 
+○ No need to be able to access internet. 
+○ Filled in the transmission speed (bit rate) according to the brand and model. 
+■ e.g. 300, 1200, 2400, 9600, 115200, 19200 bit/s Select the 
+connected 
+interface 
+Fill in the 
+transmission 
+speed 
+Select 
+Connection 
+Type ‘Serial’ 
+--- PAGE 60 ---
+60
+60
+60How to Access a Switch - VTY 
+●Connect to the administration interface by network connection .
+○ The basic networking must be conﬁgured. 
+○ e.g. ssh, telnet 
+Fill in the IP of 
+the switch. 
+Select the 
+connection method 
+--- PAGE 61 ---
+61
+61
+61How to Access a Switch - Console 
+●lists device directory to check usb device name. 
+
+--- PAGE 62 ---
+62
+62
+62How to Access a Switch - Console 
+●usenscreen to connect to the console. 
+ccna@ccna>screen /dev/ttyUSB0 
+The system has been interrupted … 
+…
+switch: 
+
+--- PAGE 63 ---
+63
+63
+63Try the Real Switch - Reset 
+●Unplug the power cord 
+●Plug in the power cord and immediately hold down the“MODE”button 
+for a while 
+
+--- PAGE 64 ---
+64
+64
+64Try the Real Switch - Reset 
+●Mount ﬂash ﬁle system 
+The system has been interrupted ... 
+...
+switch: flash_init 
+●Show ﬁles 
+switch: dir flash: 
+Directory of flash:/ 
+   13  drwx         192   Mar 01 1993 22:30:48  c2960-lanbase-mz.122-25.FX 
+   11  -rwx        5825   Mar 01 1993 22:31:59  config.text 
+   18  -rwx         720   Mar 01 1993 02:21:30  vlan.dat 
+
+--- PAGE 65 ---
+65
+65
+65Try the Real Switch - Reset 
+●Delete conﬁg.text and vlan.dat 
+switch: delete flash:config.text 
+switch: delete flash:vlan.dat 
+●Boot 
+switch: boot 
+...
+Continue with the configuration dialog? [yes/no]:  N
+Switch> 
+--- PAGE 66 ---
+66
+66
+66Try the Real Switch - SSH Conﬁguration 
+●Set a Switched Virtual Interface (SVI) to switch 
+switch(config)# interface vlan 1
+switch(config-if)# ip address 192.168.<Team-ID>.69 255.255.0.0 
+switch(config-if)# no shutdown 
+●Create a user 
+switch(config)# username username secret  passwd 
+
+--- PAGE 67 ---
+67
+67
+67Try the Real Switch - SSH Conﬁguration 
+●Conﬁgure hostname and domain name 
+switch(config)# hostname  hostname 
+CCNA-01(config)# ip domain-name  domain-name 
+●Conﬁgure RSA key pair 
+CCNA-01(config)# crypto key generate rsa 
+! Choose modulus length = 1024 
+--- PAGE 68 ---
+68
+68
+68Try the Real Switch - SSH Conﬁguration 
+●Allow users to login by SSH 
+○ Allow SSH only and use user authentication 
+CCNA-01(config)# line vty 0 15 
+CCNA-01(config-line)# transport input ssh 
+CCNA-01(config-line)# login local 
+CCNA-01(config-line)# exit ●Choose SSH version 
+CCNA-01(config)# ip ssh version 2
+
+--- PAGE 69 ---
+69
+69
+69Try the Real Switch - Cable 
+...console cable                         cable 
+--- PAGE 70 ---
+70
+70
+70Try the Real Switch - Cable 
+1. Plug in the ethernet cable. 
+2. Set 192.168.<Team_ID>.x/16  on your laptop. 
+3. Gateway will not be used for now, set it to 
+192.168.<Team_ID>.254 
+
+--- PAGE 71 ---
+71
+71
+71Try the Real Switch - SSH 
+●Ping to check connectivity 
+●Connect to the switch 
+○ Use PuTTY if you have 
+○ PowerShell / CMD: C:\> ssh -l username 192.168.<Team-ID>.69   
+
+--- PAGE 72 ---
+72
+72
+72Try the Real Switch - SSH issue 
+●Unable to negotiate with x.x.x.x  port 22: no matching cipher found 
+C:\> ssh -l username 192.168.<Team-ID>.69 -c cipher  
+●Their oﬀer: diﬃe-hellman-group1-sha1 
+○ Create a ﬁle C:\User\<username>\.ssh\config 
+○ Copy the content below to it and save 
+HostKeyAlgorithms +ssh-rsa 
+PubkeyAcceptedKeyTypes +ssh-rsa 
+KexAlgorithms +diffie-hellman-group1-sha1 
+Ciphers +3des-cbc 
+--- PAGE 73 ---
+73
+73
+73Try the Real Switch - SSH one time solution 
+ssh -o HostKeyAlgorithms=+ssh-rsa \ 
+-o PubkeyAcceptedKeyTypes=+ssh-rsa \ 
+-o KexAlgorithms=+diffie-hellman-group1-sha1 \ 
+-o Ciphers=+3des-cbc \ 
+-m hmac-sha1 \ 
+<username>@<Host_IP> 
+--- PAGE 74 ---
+74
+74
+74Force Other Users to Logout 
+●Check current connections 
+CCNA-01# clear line vty x 
+[confirm] 
+ [OK] CCNA-01# show users 
+Line User Host(s) Idle Location 
+* 0 con 0 idle 00:00:00 
+  2 vty 0 user2 idle 00:00:45 
+  3 vty 1 user3 idle 00:00:23 
+●Choose a lucky number and kick him/her out! 
+--- PAGE 75 ---
+75
+75
+75Try the Real Switch - Interconnection 
+●Connect to your neighbor team 
+...
+ ...
+ ...cable cable 
+--- PAGE 76 ---
+76
+76
+76Try the Real Switch - Interconnection 
+●Use CDP to check your neighbor(s) 
+CCNA-01# show cdp neighbors 
+CCNA-01# show cdp entry Device-ID 
+●Ping your neighbor(s) 
+CCNA-01# ping 192.168.x.y 
+●Use Wireshark to see what can be captured 
+
+--- PAGE 77 ---
+77
+77
+77Try the Real Switch - Password Recovery 
+●Set a password for console port and save 
+CCNA-01(config)# line console 0 
+CCNA-01(config-line)# password passwd 
+CCNA-01(config-line)# login 
+CCNA-01(config-line)# ^z
+CCNA-01# copy running-config startup-config 
+●Forgot password... 
+--- PAGE 78 ---
+78
+78
+78Try the Real Switch - Password Recovery 
+●Unplug the power cord 
+●Plug in the power cord and immediately hold down the“MODE”button 
+for a while 
+--- PAGE 79 ---
+79
+79
+79Try the Real Switch - Password Recovery 
+ ●Mount ﬂash ﬁle system 
+The system has been interrupted ... 
+...
+switch: flash_init 
+●Show ﬁles 
+switch: dir flash: 
+Directory of flash:/ 
+   13  drwx         192   Mar 01 1993 22:30:48  c2960-lanbase-mz.122-25.FX 
+   11  -rwx        5825   Mar 01 1993 22:31:59  config.text 
+   18  -rwx         720   Mar 01 1993 02:21:30  vlan.dat 
+
+--- PAGE 80 ---
+80
+80
+80Try the Real Switch - Password Recovery 
+●Rename conﬁg.text 
+switch: rename flash:config.text flash:config.bak 
+●Boot 
+switch: boot 
+
+--- PAGE 81 ---
+81
+81
+81Try the Real Switch - Password Recovery 
+●Enter no to reject initial conﬁguration dialog 
+Switch> enable 
+Switch# copy running-config startup-config 
+Switch#  copy flash:config.bak flash:config.text 
+Switch# copy startup-config running-config ●Restore conﬁg.text and running-conﬁg In order to access the device manager, ... 
+...
+Would you like to enter the initial configuration dialog? 
+[yes/no]: no
+Switch> 
+--- PAGE 82 ---
+82
+82
+82Try the Real Switch - Password Recovery 
+●Change the password 
+●Save to startup-conﬁg 
+CCNA-01# copy running-config startup-config 
+CCNA-01(config)# line console 0 
+CCNA-01(config-line)# password passwd 
+CCNA-01(config-line)# login 
+CCNA-01(config-line)# exit 
+CCNA-01(config)# 
+--- PAGE 83 ---
+83
+83
+83End of presentation 
+●Feel free to ask any question. 

@@ -1,0 +1,587 @@
+--- PAGE 1 ---
+1
+Lab 3. VLAN Conﬁguration 
+網路規劃管理與實務 - CCNA 2026 Spring 
+Author 
+蔡語宸< tyc@it.cs.nycu.edu.tw > 
+Credit to 許仲宇（hsuchy）周廷威 (twchou) 
+--- PAGE 2 ---
+2
+2Outline 
+1.Prerequisite knowledge 
+2.Experiment Objectives 
+3.Experiment Environment 
+4.Command Instructions 
+5.Practice Homework (Not Graded) 
+--- PAGE 3 ---
+3
+3Prerequisite knowledge 
+●Local Area Network (LAN) 
+●Virtual LAN (VLAN) 
+●Trunk link 
+○ISL (Cisco) 
+○802.1Q (IEEE) 
+■Native VLAN 
+●Inter-VLAN Routing 
+--- PAGE 4 ---
+4
+4LAN 
+●The concept of LAN is for L2 or L3? 
+●Before discussion, let us deep into what happened when your 
+host try to send a packet. 
+A B10.1.1.1/24 
+0000:0000:000A 10.1.1.2/24 
+0000:0000:000B ICMP request 
+A# ping 10.1.1.2 
+--- PAGE 5 ---
+5
+5LAN - Network Layer 
+Application Layer 
+Transport Layer 
+Network Layer 
+Data Link Layer 
+Physical Layer 
+A B10.1.1.1/24 
+0000:0000:000A 
+10.1.1.2/24 
+0000:0000:000B 
+Src IP: 10.1.1.1 
+Dst IP: 10.1.1.2 
+--- PAGE 6 ---
+6
+6
+Application Layer 
+Transport Layer 
+Network Layer 
+Data Link Layer 
+Physical Layer Is 10.1.1.2 in the same subnet? 
+- Y: ARP request for 10.1.1.2 
+- N: ARP request for 10.1.1.254 (GW) 
+A B10.1.1.1/24 
+0000:0000:000A 
+10.1.1.2/24 
+0000:0000:000B 
+ Src IP: 10.1.1.1 
+Dst IP: 10.1.1.2 LAN - Routing Decision 
+--- PAGE 7 ---
+7
+7
+A
+10.1.1.2 is at 0000:0000:000B 
+...
+Broadcast Domain Who has 10.1.1.2? 
+Tell 10.1.1.1 LAN - ARP Request 
+10.1.1.1/24 
+0000:0000:000A 
+B10.1.1.2/24 
+0000:0000:000B 
+--- PAGE 8 ---
+8
+8LAN - ARP Reply 
+B
+ARP table in A 10.1.1.2/24 
+0000:0000:000B 
+10.1.1.2 is at 0000:0000:000B 
+...IP MAC 
+10.1.1.2 0000:0000:000B 
+10.1.1.254 ….
+AARP table in B 
+IP MAC 
+10.1.1.1 0000:0000:000A 
+10.1.1.254 ….
+10.1.1.1/24 
+0000:0000:000A Who has 10.1.1.2? 
+Tell 10.1.1.1 
+--- PAGE 9 ---
+9
+9LAN - Data Link Layer 
+Application Layer 
+Transport Layer 
+Network Layer 
+Data Link Layer 
+Physical Layer Src MAC: 0000:0000:000A 
+Dst MAC: 0000:0000:000B 
+A B10.1.1.1/24 
+0000:0000:000A 
+10.1.1.2/24 
+0000:0000:000B 
+
+--- PAGE 10 ---
+10
+10LAN Conclusion 
+●So the concept of LAN is for L2 or L3? 
+●Both L2 and L3 have LAN concept 
+○L2 LAN: Broadcast domain (Using MAC) 
+■domain in which all nodes can reach each other by 
+broadcast at the data link layer. 
+○L3 LAN: Subnet (Using IP) 
+●But more general definition of LAN: No need to be routed! 
+--- PAGE 11 ---
+11
+11VLAN - One Switch, but Isolated LANs 
+●Action : Seperate the network traffic into 3 virtual LANs 
+●Result : Devices in VLAN 20 would NOT received  any flooded 
+packets from the other VLAN 
+○e.g. ARP request packet 
+from other VLAN 
+VLAN 10 VLAN 20 VLAN 30 
+--- PAGE 12 ---
+12
+12●Result : PC in VLAN 10 send packet, only PC in VLAN 10 can receive. 
+●Hence we seperate an L2 LAN into several VLANs, every VLAN is a 
+logically isolated broadcast domain VLAN - Logical View from an sigle switch 
+
+--- PAGE 13 ---
+13
+13VLAN - Across Switchs 
+●How can VLAN 10 came across to another switch ? 
+●How should we connect the two switches with VLAN info? 
+
+--- PAGE 14 ---
+14
+14VLAN - Across Switchs (Conti.) 
+●Connect VLAN 10 from switch-1 to switch-2 
+●It wasted not only physical interfaces but a lot of network 
+wiring cost! 
+
+--- PAGE 15 ---
+15
+15VLAN - Better Sol. Across Switchs (Conti.) 
+●Connect VLAN 10 from switch-1 to switch-2 
+●Solution: Connect two switches with one link allowed multiple 
+VLANs. 
+
+--- PAGE 16 ---
+16
+16VLAN Modes 
+●Each interface has its VLAN mode 
+○Access mode 
+■the interface is in a speciﬁc VLAN , switch would forwards 
+network traﬃc from those the same VLAN  to this 
+interface 
+○Trunk mode 
+■the interface would allowes some VLANs , and switch 
+would forwards network traﬃc from those allowed VLANs 
+--- PAGE 17 ---
+17
+17
+Trunk (VLAN 10,20,30) 
+VLAN 10 
+VLAN 20 VLAN 20 
+VLAN 10 
+VLAN 30 VLAN 30 
+VLAN 10 
+VLAN 20 
+VLAN 30 VLAN 10 VLAN 20 VLAN 30 VLAN Trunk Mode 
+--- PAGE 18 ---
+18
+18VLAN Tagging - Packet Format 
+●IEEE 802.3 (Ethernet) with VLAN information 
+○Cisco ISL (seldom used) 
+○IEEE 802.1Q 
+Dst. MAC Src. MAC Type/Length Data(Payload) CRC 
+Dst. MAC Src. MAC Type/Length Data(Payload) CRC TPID TAG
+0x8100 
+--- PAGE 19 ---
+19
+19VLAN Tagging - The Diﬀerences 
+●Review : Tagging of access/trunk interface 
+●Access 
+○expect receive untagged frame 
+■drop tagged frame when received 
+○remove frame’s tag before sending out 
+●Trunk 
+○expect receive tagged frame. 
+■if frame is untagged, consider it is inside native VLAN 
+○add frame’s tag before sending out 
+--- PAGE 20 ---
+20
+20L3 Switch 
+Trunk 
+Trunk Trunk 
+Access 
+Trunk 
+Access Trunk Topology 
+--- PAGE 21 ---
+21
+21Switched Virtual Interface (SVI) 
+●Switch does not have a physical interface to which an IP address can be assigned. 
+○IP is configured on a virtual interface called switched virtual interface (SVI) .
+●Switched Virtual Interface (SVI) 
+○A single SVI can only be mapped to a VLAN. 
+○A SVI cannot be activated unless that VLAN associated with at least one  
+active physical port. 
+○SVI provides the Layer 3 processing for packets from all active physical ports 
+associated with the VLAN. 
+■routing packet from/to other SVI 
+■no need physical router for inter-VLAN routing 
+--- PAGE 22 ---
+22
+22Inter-VLAN Routing L3 Switch 
+VLAN 10 SVI (Gateway) 
+VLAN 20 SVI (Gateway) 
+VLAN 10 
+ VLAN 10 
+
+--- PAGE 23 ---
+23
+23Inter-VLAN Routing 
+L3 Switch 
+VLAN 10 VLAN 10 VLAN20 VLAN20 VLAN 30 
+VLAN 10 VLAN 10 VLAN 30 VLAN 30 VLAN 30 SVI
+VLAN 10 SVI
+VLAN 20 
+SVI
+VLAN 30 Physical Interface 
+--- PAGE 24 ---
+24
+24●If your topology has device that does not recognize VLAN tag 
+○e.g. Hub . It would not untag the VLAN tag of a packet. 
+Instead, it will simply flooding the packet received. 
+Trunk 
+(Vlan 10 20 30) VLAN 10 Default Native VLAN 1 
+Hub
+Drop packet in VLAN 10 
+(get VLAN 10 packet with tag) (L1 Repeater) 
+VLAN 20 
+VLAN 10 VLAN 10 
+VLAN 20 
+Trunk - Native VLAN 
+--- PAGE 25 ---
+25
+25
+●Use native VLAN to solve this kind of problem 
+○when a trunk interface transmit packet with its native VLAN, 
+it will send the packet untagged 
+Receive packet in VLAN 10 
+(get VLAN 10 packet without tag) 
+(also drop acket in VLAN 20 because it is tagged) 
+Trunk - Native VLAN 
+Trunk 
+(Vlan 10 20 30) VLAN 10 Default Native VLAN 1 
+Hub
+(L1 Repeater) 
+VLAN 20 
+VLAN 10 
+VLAN 20 
+
+--- PAGE 26 ---
+26
+26Outline 
+1.Prerequisite knowledge 
+2.Experiment Objectives 
+3.Experiment Environment 
+4.Command Instructions 
+5.Practice Homework (Not Graded) 
+--- PAGE 27 ---
+27
+27Experiment Objectives 
+●Configure VLANs to test communication between different 
+networks. 
+●Compare access links and trunk links. 
+●Configure and understand the use of Native VLAN. 
+●Implement inter-VLAN routing to understand Layer 2 and Layer 
+3 differences. 
+--- PAGE 28 ---
+28
+28Experiment Environment 
+Device IP
+PC1 10.1.10.1/24 
+PC2 10.1.10.2/24 
+PC3 10.1.20.1/24 
+PC4 10.1.20.2/24 
+--- PAGE 29 ---
+29
+29Outline 
+1.Prerequisite knowledge 
+2.Experiment Objectives 
+3.Experiment Environment 
+4.Command Instructions 
+5.Practice Homework (Not Graded) 
+--- PAGE 30 ---
+30
+30Scenario Introduction 
+●There are two departments, A and B, 
+in the company. 
+●The department manager wants 
+machines in different departments to 
+be in separate networks. 
+●As the network administrator, you 
+recall the VLAN knowledge learned in 
+class and start the configuration. 
+10.1.10.1/24 10.1.10.2/24 10.1.20.1/24 10.1.20.2/24 
+--- PAGE 31 ---
+31
+31Required Commands - VLAN 
+●Creating a VLAN 
+switch# configure terminal 
+switch(config)# vlan  vlan-num 
+switch(config-vlan)# name vlan-name (optional) 
+●Assigning Ports to a VLAN 
+(config)# interface type  interface_number 
+(config-if)# switchport mode access 
+(config-if)# switchport access vlan  vlan-num Reference VLAN numbers from later slides 
+access link 
+--- PAGE 32 ---
+32
+32VLAN Numbering in Cisco IOS 
+VLANs Range Usage 
+0, 4095 Reserved Reserved for system use only. Not visible or usable. 
+1 Normal Default Cisco VLAN. Cannot be deleted. Used for Control Plane 
+Traffic (e.g., CDP , BPDU). 
+2-1001 Normal Normal VLANs for Ethernet. Can be created, used, and deleted. 
+1002-1005 Normal Default Cisco VLANs for FDDI and Token Ring. Cannot be 
+deleted. 
+1006-4094 Extended Extended VLANs for Ethernet only. 
+--- PAGE 33 ---
+33
+33Required Commands - Scenario Demonstration 
+switch(config)# vlan  10
+switch(config-vlan)# name department-A 
+...
+switch(config)# vlan  20
+switch(config-vlan)# name department-B 
+...
+switch(config)# interface fastEthernet 0/1 
+switch(config-if)# switchport mode access 
+switch(config-if)# switchport access vlan  10
+...
+switch(config)# interface fastEthernet 0/4 
+switch(config-if)# switchport mode access 
+switch(config-if)# switchport access vlan  20
+...
+--- PAGE 34 ---
+34
+34Scenario Introduction 
+●Now, the Layer 2 traffic between departments A 
+(VLAN 10) and B (VLAN 20) is isolated. 
+●Endpoints are connected to the L2 Switch via 
+access links. 
+●To enable inter-VLAN communication, an L3 
+Switch is required. 
+●A single physical link must allow VLAN traffic 
+using trunking. 
+access link 
+10.1.10.1/24 10.1.10.2/24 10.1.20.1/24 10.1.20.2/24 
+--- PAGE 35 ---
+35
+35Required Commands - Trunk 
+●Configuring a Trunk Link 
+(config)# interface type  interface_number 
+(config-if)# switchport trunk encapsulation {isl|dot1q |negotiate }
+! ISL is an older Cisco proprietary protocol, 802.1Q is the standard 
+! trunking protocol. Some newer switches only support dot1q. 
+(config-if)# switchport trunk allowed vlan  {vlan-list| except vlan-list |all}
+(config-if)# switchport mode trunk 
+●Modifying an Existing Trunk Link 
+(config-if)# switchport trunk allowed vlan  {add|remove } vlan-list trunk link 
+--- PAGE 36 ---
+36
+36Required Commands - Scenario Demonstration 
+switch(config)# interface gigabitEthernet 0/1 
+switch(config-if)# switchport trunk allowed vlan  10,20 
+switch(config-if)# switchport mode trunk 
+! There is no encapsulation command on switch 2960 
+...
+L3switch(config)# interface gigabitEthernet 1/0/1 
+L3switch(config-if)# switchport trunk encapsulation dot1q 
+L3switch(config-if)# switchport trunk allowed vlan  10,20 
+L3switch(config-if)# switchport mode trunk 
+! The L3 switch 3650 has the encapsulation command, but only supports 
+! dot1q. 
+...
+--- PAGE 37 ---
+37
+37
+access link Scenario Introduction 
+●The L3 switch is now receiving traffic 
+from the PCs. 
+●Lastly, the VLAN gateway IP must be 
+set on the SVI of the L3 switch, and 
+routing must be enabled. 
+●Configure the PCs' gateways properly 
+so that different VLANs can 
+communicate through routing. trunk link 
+10.1.10.1/24 10.1.10.2/24 10.1.20.1/24 10.1.20.2/24 
+--- PAGE 38 ---
+38
+38Required Commands - Inter-VLAN Routing 
+●Creating VLAN on Router/L3 Switch 
+(config)# vlan vlan-num 
+(config-if)# name vlan-name (optional) 
+●Configuring VLAN Interface (SVI) and setting VLAN Gateway IP 
+(config)# interface vlan  vlan-num 
+(config-if)# ip address ip netmask 
+●Enabling Routing on L3 Switch 
+(config)# ip routing 
+--- PAGE 39 ---
+39
+39Required Commands - Scenario Demonstration 
+L3switch(config)# vlan  10
+...
+L3switch(config)# vlan  20
+...
+L3switch(config)# interface vlan  10
+L3switch(config-if)# ip address 10.1.10.254 255.255.255.0 
+...
+L3switch(config)# interface vlan  20
+L3switch(config-if)# ip address 10.1.20.254 255.255.255.0 
+...
+L3switch(config)# ip routing 
+
+--- PAGE 40 ---
+40
+40
+access link Scenario Introduction 
+●The configuration is finally 
+complete! VLAN 10 and VLAN 20 
+can now communicate with each 
+other through the L3 switch's 
+routing. trunk link 
+10.1.10.1/24 10.1.10.2/24 10.1.20.1/24 10.1.20.2/24 
+--- PAGE 41 ---
+41
+41
+Scenario Introduction 
+●As you prepare to leave 
+work, your boss approaches 
+with a hub (which does not 
+support VLANs) and asks if 
+you can configure a 
+sub-department A2 so they 
+can also use the company 
+network. 10.1.10.1/24 10.1.10.2/24 10.1.20.1/24 10.1.20.2/24 10.1.10.3/24 
+--- PAGE 42 ---
+42
+42Required Commands - Native VLAN 
+●Configuring Native VLAN 
+(Cisco's default Native VLAN is VLAN 1) 
+(config)# interface type  interface_number 
+(config-if)# switchport trunk encapsulation dot1q 
+(config-if)# switchport trunk native vlan  vlan-num 
+--- PAGE 43 ---
+43
+43Required Commands - Scenario Demonstration 
+switch(config)# interface fastEthernet 0/5 
+switch(config-if)# switchport trunk native vlan  10
+switch(config-if)# switchport mode trunk 
+●Even though the hub does not support VLANs, department A2 
+can now communicate directly with department A via Layer 2. 
+--- PAGE 44 ---
+44
+44Required Commands (Supplementary) - Dynamic Trunking 
+●There is also dynamic mode, which can dynamically negotiate 
+whether to use access or trunk mode 
+○dynamic desirable: The port actively  attempts to switch the link 
+to trunking mode. 
+○dynamic auto: Passive  negotiation; only switches to trunk mode if 
+the other switch actively requests it. 
+(config)# ... omitted 
+(config-if)# switchport mode dynamic  {desirable |auto }Keywords: "Cisco DTP", "dynamic trunking protocol". 
+--- PAGE 45 ---
+45
+45Outline 
+1.Prerequisite knowledge 
+2.Experiment Objectives 
+3.Experiment Environment 
+4.Command Instructions 
+5.Practice Homework (Not Graded) 
+--- PAGE 46 ---
+46
+46Lab 1 -  VLAN 
+設定： 
+1. 使用  Cisco 2960 當作  Switch 
+2. 建立三個  end point (PC) 
+○PC1: 192.168.10.1/24 
+○PC2: 192.168.10.2/24 
+○PC3: 192.168.10.3/24 
+3. 在 2960 上為各個  PC 設定  VLAN 10, 20 
+--- PAGE 47 ---
+47
+47Lab 1 -  VLAN 
+回答以下問題： 
+1. 監聽封包，觀察在  Interface 上 VLAN 前後， PC1 是否可以碰到  
+PC2 ，為什麼？請附上在加上  VLAN 之後封包的截圖 
+2. 監聽封包，觀察在  Interface 上 VLAN 前後， PC1 是否可以碰到  
+PC3 ，為什麼？請附上在加上  VLAN 之後封包的截圖 
+3. 根據截圖， 說 明 boardcast domain 的變化  (hint: ARP) 
+--- PAGE 48 ---
+48
+48
+Lab 2 - Trunk link 建出下方拓樸 
+想想如果不透過  Trunk link ，該如何實作  ? 中的鏈路，讓  
+PC1 、PC2 、PC4 可以互通， PC3 、PC5 可以互通 (Trunk link) ?
+--- PAGE 49 ---
+49
+49Lab 2 - Trunk link 
+回答以下問題： 
+1. 附上拓樸的截圖 
+2. 解釋如何實作  ? 部分的線路 
+3. 說 明 trunk link 的優點， trunk link 與 ? 之間的線路比較 
+--- PAGE 50 ---
+50
+50
+Lab 3 - Native VLAN 先建出下方拓樸， 
+並回答後方  5 個問題 
+--- PAGE 51 ---
+51
+51Question 3-1 
+● 在沒有設定  Native VLAN 的情況，觀察  PC4 到 PC7 的封包，並
+依標記規則 ( 詳見後方投影片 ) 直接在圖上標記答案 
+
+--- PAGE 52 ---
+52
+52
+Lab 3 -  標記規則 
+標記規則 
+● 在圖上標示  IN/OUT 的附近標示該位置是否帶有  VLAN tag (IN, OUT 都要標 )
+● 有 VLAN tag: 有tag( vlan-id )
+● 無 VLAN tag: 無tag
+● 如果 PC4 傳送不到  PC7 ，請直接以  X 標示在錯誤發生 起始 點，並 說 明理由 請複製下圖，並以 文字 標示在圖上來回答題組，箭頭方向為封包傳送
+方向 
+--- PAGE 53 ---
+53
+53Lab 3 -  Native VLAN 
+舉例來 說
+無tag 有tag(100) 
+X
+理由: ...
+--- PAGE 54 ---
+54
+54
+Ref - 怎麼看 VLAN tag 
+
+--- PAGE 55 ---
+55
+55
+Question 3-2 
+● 將 Switch2 Gi0/2 的 Native VLAN 設為  20 ，觀察  PC4 到 PC7 的封包
+，並 依標記規則 直接在圖上標記答案 
+
+--- PAGE 56 ---
+56
+56
+Question 3-3 
+● 接續問題  3-2 ，將 Switch1 Gi0/2, Switch2 Gi 0/2 的 Native VLAN 都設為  
+20 ，觀察  PC4 到 PC7 的封包，並 依標記規則 直接在圖上標記答案 
+--- PAGE 57 ---
+57
+57
+Question 3-4 
+● 接續問題  3-3 ，再將  Switch1 Gi0/1 的 Native VLAN 設為  20 ，觀察  
+PC4 到 PC7 的封包，並 依標記規則 直接在圖上標記答案 
+--- PAGE 58 ---
+58
+58
+Question 3-5 
+● 接續問題  3-4 ，將全部的  Native VLAN 設為  20 ，觀察  PC4 到 
+PC7 的封包，並 依標記規則 直接在圖上標記答案 
+--- PAGE 59 ---
+59
+59Appendix: Veriﬁcation Commands 
+●show running-config 
+●show interfaces  [status  | trunk ]
+●show vlan id  vlan-id 
+●show vlan  [brief ]
+●show interface  type member/module/name  switchport 
+●show ip route 

@@ -1,0 +1,1077 @@
+--- PAGE 1 ---
+1
+Lab1. Linux Network 
+網路規劃管理與實務 - CCNA 2026 Spring 
+Authors: 
+許仲宇 <hsuchy@it.cs.nycu.edu.tw> 
+施羿廷 <ytshih@it.cs.nycu.edu.tw> 
+--- PAGE 2 ---
+2
+2Outline 
+●Linux network basic 
+○ Why linux? 
+○ Linux Networking 
+○ Basic network tools 
+●Network management tools 
+○ iproute2 
+○ systemd-networkd 
+●Lab 
+○ Psuedo-container network with iproute2 
+○ VM network with systemd-networkd 
+--- PAGE 3 ---
+3
+3Linux network 
+basic “Men are born and remain 
+free and equal in rights. 
+Except for those using 
+Windows ServerTM.”
+— Declaration of the Rights of Man 
+and of the Citizen, I, 1789 
+--- PAGE 4 ---
+4
+4Why Linux? 
+●Linux is widely used in network area 
+○ almost all servers  run on Linux (or BSD) 
+○ many network devices  run on Linux/BSD based ﬁrmware 
+●Example: OpenWrt 
+○ A highly conﬁgurable Linux-based OS for embedded devices 
+○ Can be installed and run on many network hardware. List. 
+●Example: Open vSwitch/VyOS 
+○ Linux-based OS for virtual switch/router(ﬁrewall) 
+--- PAGE 5 ---
+5
+5Why not Cisco / Juniper 
+●You may never own a Cisco / Juniper device in lifetime 
+●But instead may own and manage: 
+○ a network composed by Linux machine 
+○ … or by Linux VMs 
+○ … or by container 
+○ … or a mix of above 
+--- PAGE 6 ---
+6
+6Linux Networking 
+●Network Namespaces 
+●Virtual Ethernet (veth) 
+●Bridges 
+●VXLAN 
+●Virtual Routing Functions (VRFs) 
+●Netﬁlter 
+●…
+--- PAGE 7 ---
+7
+7● Network namespace 
+○ Fundamentals of container networks 
+○ Logically separate network resources 
+○ Each namespace has its own: 
+■ Routing table 
+■ Firewall rules 
+■ Network devices (NICs) 
+● Process  can only see and manipulate 
+network resource within its namespace 
+Linux Networking 
+Network Namespace 
+--- PAGE 8 ---
+8
+8●Processes do not know other namespaces exist 
+○ How do they communicate? 
+●Veth: Virtual Ethernet 
+○ A special type of virtual interfaces 
+○ Always comes in pair 
+●Two veth interfaces can be in diﬀerent namespace 
+●Veth transmit packet from/to peer  veth 
+○ Even in a diﬀerent namespace 
+○ Think the link between veth pair as an ethernet cable. Linux Networking 
+Veth 
+--- PAGE 9 ---
+9
+9● Another special type of virtual interfaces 
+● Acts like a light-weight virtual switch※
+● Physical/Virtual network interfaces can 
+connected to it 
+● Bridge can forward packet to/from connected 
+interfaces 
+※ Actually, Switch is also called MAC bridge by IEEE 
+ Source: Red Hat devlopers blog Linux Networking 
+Bridge 
+--- PAGE 10 ---
+10
+10●VXLAN: Virtual Extensible Local Area Networks 
+○ Encapsulates Ethernet frames  inside UDP packets 
+○ Adopted in data center networks 
+○ Usually VM host will be responsible for encapsulating/decapsulating VXLAN packets 
+■ Also maintains VXLAN forwarding table, reducing the workload of switches. Linux Networking 
+Virtual Extensible LAN 
+--- PAGE 11 ---
+11
+11●Virtual Routing and Forwarding (VRF) 
+○ Grouping network interfaces to multiple VRF domains 
+○ Every VRF domain has its own routing table 
+○ Logically divides  one router to multiple routers Linux Networking 
+Virtual Routing and Forwarding 
+--- PAGE 12 ---
+12
+12●Modern Linux kernel packet classiﬁcation framework 
+●Deﬁne multiple hooks, e.g.  PREROUTING, INPUT , FORWARD, OUTPUT , 
+POSTROUTING 
+○ On the hook, there may be some rule 
+○ During packet ﬂow  through kernel network stack, it may trigger some hooks. 
+■ Trigger the rules on it 
+○ Ruleset checks some condition (e.g., source ip of the packet) 
+○ If the conditions are met, some action are performed. For example: 
+■ DROP/ACCEPT the packet (ﬁrewall) 
+■ MASQUERADE the packet (NAT) 
+○ User can register custom rule onto the hook Linux Networking 
+Netﬁlter 
+--- PAGE 13 ---
+13
+13
+
+--- PAGE 14 ---
+14
+14Basic network tool - CLI 
+●ping ( man )
+●ssh ( man )
+●ip (man ual)
+●traceroute/mtr ( man /man )
+●nmap ( man )
+●iperf2/iperf3 ( man /man )
+●tcpdump ( man )
+●dig ( man )
+--- PAGE 15 ---
+15
+15Basic network tool - CLI 
+Ping 
+●Your friendly neighborhood ping 
+●Send some packets (ICMP) for quick checking network status 
+○ It troubleshoot reachability , name resolution, network latency 
+●Frequently used options 
+○-c count : send only count  packets (if not set, send inﬁnitely) 
+○-I interface : use interface  for ping, useful for troubleshooting speciﬁc interface. 
+--- PAGE 16 ---
+16
+16● Locate where your network starts to die 
+● Print the route packets taken, from your 
+machine to a given host 
+○ troubleshoot reachability and routing Basic network tool - CLI 
+Traceroute 
+Source: What is the Traceroute Command in Linux? 
+--- PAGE 17 ---
+17
+17●Frequently used options 
+○-n: do not try to print hostname for each hop. Only showing numeric IP addresses 
+○-I/-T: using ICMP ECHO/TCP SYN packet for probing the route 
+■ Traceroute use UDP as the default. But Firewall may block UDP .  See manual for  
+more 
+○-z sendwait : waiting sendwait  between each probe packet 
+■ If sendwait  <= 10, the unit will be seconds. Otherwise, the unit will be milliseconds. Basic network tool - CLI 
+Traceroute 
+--- PAGE 18 ---
+18
+18●My Trace Route, provides a prettier interface for traceroute 
+●repeatedly preforms traceroute, and auto-calculate summary statistics Basic network tool - CLI 
+MTR 
+--- PAGE 19 ---
+19
+19●Utility for network discovery  and security auditing 
+●You can use it to quickly ﬁnd reachable hosts and their open ports 
+○ within a range of IPs 
+○ nmap can also infer what service is actually running on the port, see manual 
+●USED WITH CAUTION . You may get banned. Especially in school. 
+○ you can use scanme.nmap.org as the target, for testing and practicing. 
+-sn: only host discovery -n: do not perforn DNS 
+resolve -v: verbose output -e interface : use which 
+interface 
+-O: show host OS version -sV: probing for version of 
+service -sS: use TCP SYN 
+for port scanning -p portsRange : scan only 
+portsRange Basic network tool - CLI 
+nmap 
+--- PAGE 20 ---
+20
+20●measure network traﬃc , including throughput and latency 
+○ iperf2 and 3 are diﬀerent projects, maintained by diﬀerent teams, with diﬀerent goals 
+○ Below will only cover iperf3 
+●iperf can let you test the network between a client  and server 
+○ both need to run iperf. 
+○ Server runs iperf -s . Client runs iperf -c serverAddr 
+●Frequently used options 
+○-p port : run iperf on port . Default 5201 
+○-D: server only. Make iperf3 server run as a daemon (at the background) 
+○-b n[KMGT] : client only. set target bitrate to n bits/sec 
+○-t time /-n n[KMGT] : client only. Run for time  seconds / Run until send n bytes Basic network tool - CLI 
+iperf2 & iperf3 
+--- PAGE 21 ---
+21
+21●A tool for monitoring network interfaces , and dumping captured packets 
+●Can use a ﬁlter expression  to capture packets that satisﬁes some 
+conditions 
+○ such an expression called pcap-ﬁlter . see manual 
+●Frequently used options 
+○-i interface : monitor on interface . Usually require root permission 
+○-q/-v/-vv/-vvv : output quietly / verbosely / more verbosely / much more verbosely 
+○-A/-x/-X : print captured packet header and content in ASCII / HEX / both 
+○-w file : save captured packet in file  (in PCAP Capture File Format , binary) 
+○-r file : read packet info from file Basic network tool - CLI 
+tcpdump 
+--- PAGE 22 ---
+22
+22●tool to perform DNS lookups  and display the answers※
+○ Another useful tool for similar functionality is nslookup .
+●Syntax: dig @ server name type 
+○ You can also use dig @ server  -q name  -t type  to eliminate ambiguity 
+●Frequently used options 
+○-x addr : perform reverse DNS lookup for addr . 
+■ You do not need to provide the name and type if using this option 
+○+noall +answer : display only answer section 
+○+short : display only the rightmost column of the answer section. 
+※ If you ﬁnd diﬃcult to read result of dig, you can refer to this article .Basic network tool - CLI 
+dig 
+--- PAGE 23 ---
+23
+23●Perhaps the most useful tool for logging into a  remote host machine 
+○ Besides CLI arguments, you can also use conﬁg ﬁle  to manage ssh options, per host basis. 
+●Frequently used options 
+○-l username:  Try to login remote machine as username 
+○-p port:  Specify port  on remote machine to connect to. 
+■ Or you can write as: [user@ ]dst_hostname [:port ]
+○-i id_file:  Specify id_file  as private key ﬁle for public key authentication 
+○-J [user@ ]dst[:port ]: Connect to dst  ﬁrst, then connect to host  from dst .
+■ Useful when host is public unreachable, and dst is a entrypoint of such intranet. 
+○-L/-R : SSH port forwarding. More on the following pages. 
+■ You can also read this great article  for more info. Basic network tool - CLI 
+SSH 
+--- PAGE 24 ---
+24
+24●You're doing your NA homework with an laptop at Starbucks. 
+○ That is, your laptop very likely behind NAT , which is not public reachable 
+●Your nginx is running on your PC in your dorm with a public ip. 
+○ The nginx server is listening request on localhost:5432 
+●You want to access your nginx from your laptop. 
+your PC 
+Web server 
+localhost:5432 
+your laptop Private network 
+SSH server 
+140.113.2.2:22 😀
+👍
+😡
+🔪
+Basic network tool - CLI 
+SSH - Local Port Forwarding Scenario 
+--- PAGE 25 ---
+25
+25●-L [bind_address :]port :host :hostport 
+○Example below: ssh server_addr  -L 9999:localhost:5432 
+○SSH client will listen  on local address※, and forwards packet to SSH server  
+■“Local ” port forwarding means the port is listened on the local side  
+○SSH server will forward packets into remote address※ 
+Listen on 
+localhost:9999 
+SSH tunnel Laptop PC
+SSH
+Client SSH
+Server Web
+Server Listen on 
+localhost:5432 
+curl localhost:9999 
+forwarding 
+※ local address: [bind_address:]port ;   remote address: host:hostport Basic network tool - CLI 
+SSH - Local Port Forwarding 
+--- PAGE 26 ---
+26
+26●Now, somehow you have a web server on your NAT-behind laptop instead. 
+○ It also listen on localhost:5432 
+●And your girl/boyfriend wants to connect to your web server from dorm. 
+●Can we use local port forwarding again? 
+○ No.
+your GF/BF PC 
+Web server 
+localhost:5432 
+your laptop Private network SSH server 
+140.113.2.2:22 😀
+👍
+SSH server 
+192.168.1.1:22 😡
+🔪
+😡
+🔪
+NAT Basic network tool - CLI 
+SSH - Problem with local port forwarding 
+--- PAGE 27 ---
+27
+27●Why local port forwarding is impossible in this case? 
+○ Since your laptop is behind NAT , your PC cannot SSH onto your laptop 
+○ Unless you conﬁgure port forwarding on ﬁrewall or router , and expose out port 22 
+■ But if this option is available, you may just expose port 5432 
+●Solution: Remote port forwarding 
+your GF/BF PC 
+Web server 
+localhost:5432 
+your laptop Private network SSH server 
+140.113.2.2:22 😀
+👍
+SSH server 
+192.168.1.1:22 😡
+🔪
+😡
+🔪
+NAT Basic network tool - CLI 
+SSH - Remote Port Forwarding Scenario 
+--- PAGE 28 ---
+28
+28●-R [bind_address :]port :host :hostport 
+○ Example below: ssh server_addr  -R 0.0.0.0:9999:localhost:5432 
+○ SSH server  will listen on remote address※, and forward packets to SSH client 
+■“Remote” port forwarding means the port is listened on the remote side  
+○ SSH client  will transmit forwarded packets into local address※
+SSH tunnel PC Laptop 
+SSH
+Server SSH
+Client Web
+Server Listen on 
+localhost:5432 
+curl localhost:9999 
+forwarding Listen on 
+0.0.0.0:9999 
+※ remote address: [bind_address:]port ;   local address: host:hostport Basic network tool - CLI 
+SSH - Remote Port Forwarding 
+--- PAGE 29 ---
+29
+29Basic Network Tool - GUI 
+●Your desktop environment: GNOME and KDE 
+○ Something like “System - Setting - Network”window 
+○ GNOME and KDE usually use NetworkManager  as backend for network setting UI 
+●Wireshark 
+○ Similar to tcpdump  we introduced just before. Except it has GUI 
+○ You can choose interface, and write pcap-ﬁlter expression to ﬁlter packet. 
+○ It can give you information about packet in much more intuitive way, like: 
+■ highlight packet bytes, which is corresponding to same packet header ﬁeld 
+■ parse some packet content of common protocol, like DNS packet. 
+○ Go take some tutorial for yourself ( ref1 , ref2 )
+--- PAGE 30 ---
+30
+30Network 
+Management 
+Tool “Hey, I ﬁx my network!” 
+“Wow, what do you do?” 
+“ip link set eth0 down” 
+“then?” 
+“ip link set eth0 up” 
+--- PAGE 31 ---
+31
+31Network Management Tool 
+●Tool for managing your network interfaces and conﬁguration 
+●We will cover two of them in this lecture 
+○iproute2 
+■ A collection of network management and monitoring  utilities (tools) 
+●ip, tc (Traffic Control), ss (Socket Statistics), Bridge 
+■ Using CLI command. 
+○systemd-networkd 
+■ a lightweight, system-level service within the systemd  suite designed to manage 
+network conﬁgurations , 
+● particularly for servers, embedded devices, and complex networking setups 
+■ Mostly using conﬁguration ﬁle. 
+--- PAGE 32 ---
+32
+32iproute2 
+●A collection of tools (e.g., ip) for managing various network objects 
+○ Network device, address, routing table, VRF table, tunnel, network monitor, etc 
+●Mostly used objects in ip:
+○ip address : Manage address on a device. ( man )
+○ip link : Conﬁgure network device, or create virtual device. ( man )
+○ip route : Conﬁgure routing table. ( man )
+○ For reference of other objects, see ip(8) 
+●Frequently used options: 
+○-c: print result in color. 
+--- PAGE 33 ---
+33
+33●ip link show : Show all interface (show can be omitted) 
+●ip link show bridge : Show only interface with type bridge 
+●ip link add name dum0  type dummy : Add a dummy dev called dum0 
+●ip link add name ve11  type veth  peer name  veth22 
+○ Add a veth pair, one end named ve11  and other end name veth22 
+●ip link set eth0  up/down : Bring eth0  up/down 
+●ip link set ve11  master br0: Connect ve11  onto bridge br0
+●ip link del dum0 : Delete dev dum0 Basic network tool - CLI 
+ip link - Example 
+--- PAGE 34 ---
+34
+34●ip address show : Show address of all interfaces 
+●ip addr show  up:  Show only address of up interfaces 
+●ip a add  192.168.100.1/24  brd 192.168.100.255  dev ve11 
+○ Add such address to dev ve11 
+○brd  can also replace with +, which will represent last the ip address in the subnet. 
+●ip a del  192.168.100.1/24  dev ve11 
+○ Remove such address 
+●ip a flush dev  ve11 : Remove all address on ve11 Basic network tool - CLI 
+ip address - Example 
+--- PAGE 35 ---
+35
+35●ip [-c]  route [show] : show addresses of all interfaces 
+●ip r add  10.0.0.0/24 via 192.168.1.1 dev eth0 
+○ Add route to 10.0.0.0/24 through the gateway 192.168.1.1 using interface eth0 
+●ip r add default via 192.168.1.254 
+○ Deﬁnes a default route 
+●ip r del 10.0.0.0/24  via 192.168.1.1  dev eth0 
+○ Remove the route 
+●ip r replace 10.0.0.0/24  via 192.168.1.254  dev eth0 
+○ If the route exists, it ’s updated; if not, it ’s added Basic network tool - CLI 
+ip route - Example (1/2) 
+--- PAGE 36 ---
+36
+36●ip r get 8.8.8.8 
+○ Show route lookup for a destination 
+●ip r add blackhole 192.168.100.0/24 
+○ Add a blackhole route (Packets destined for this network are silently dropped) 
+●ip r add unreachable 192.168.100.0/24 
+○ Drops + sends “Destination Unreachable ” (ICMP type 3, code 1) 
+●ip r add prohibit 192.168.100.0/24 
+○ Drops + sends “Admin Prohibited ” (ICMP type 3, code 13) Basic network tool - CLI 
+ip route - Example (2/2) 
+--- PAGE 37 ---
+37
+37default via 172.18.23.254  dev wlo1  proto dhcp src 172.18.16.1  metric 600 
+172.18.16.0/21  dev wlo1  proto kernel scope link src 172.18.16.1  metric 600 
+172.18.16.0/24  dev wlo2  proto static scope link src 172.18.16.2 
+●First will be PREFIX. 
+○ For most common case, packet route is decided by its destination .
+○ If a route PREFIX is a preﬁx of packet dst , the route will be candicated. 
+○ If multiple routes are candicated, the  route with longest PREFIX  will be chosen. 
+○default  is alias for 0.0.0.0/0, which can be preﬁx of every IPv4 address. 
+●For example 
+○ 172.18.17.1 match 1st and 2nd route. It will choose 2nd route since it has preﬁx length 21 
+○ 172.18.16.1 match 1st, 2nd & 3rd route. It will choose 3rd route since it has preﬁx length 24 Basic network tool - CLI 
+ip route - Tips 
+--- PAGE 38 ---
+38
+38default via 172.18.23.254  dev wlo1  proto dhcp src 172.18.16.1  metric 600 
+172.18.16.0/21  dev wlo1  proto kernel scope link src 172.18.16.1  metric 600 
+172.18.16.0/24  dev wlo2  proto static scope link src 172.18.16.2 
+●dev  means which interface  will the packet be sent. 
+●proto  indicate where  does this route come from 
+○ For example, kernel  means it is from auto conﬁguration. 
+○static  means manually set. 
+●via  means next hop  router address 
+○ I.e. gateway, or“the next router the packet should go to on this route” 
+○ Route with no next hop implies destination  should resides in same subnet .Basic network tool - CLI 
+ip route - Tips (cont.) 
+--- PAGE 39 ---
+39
+39default via 172.18.23.254  dev wlo1  proto dhcp src 172.18.16.1  metric 600 
+172.18.16.0/21  dev wlo1  proto kernel scope link src 172.18.16.1  metric 600 
+172.18.16.0/24  dev wlo2  proto static scope link src 172.18.16.2 
+●src  and link  involves with source address selection 
+●If a packet is generated by a network app on host: 
+○ If the network app has speciﬁed source address (e.g. by bind()). That address are used. 
+○ Otherwise, if src exist, kernel will use src ﬁeld on the chosen route as source address. 
+○ Otherwise, the scope ﬁeld and IP address on output device is used to be source address. 
+●Ref: Source Address Selection , Usage about scope Basic network tool - CLI 
+ip route - Tips (cont.) 
+--- PAGE 40 ---
+40
+40●If you want to make your linux machine a router: 
+○ Besides well conﬁgured routing table, you should at least enable packet forwarding 
+○ Perhaps you should also conﬁgure netﬁlter , which will covered on supplement slides 
+●In default, packet route is decided based on destination address 
+○ If you want to use source address  or other info on packet for routing decision, consider 
+Policy-based routing 
+■ For more info, consider this article , ip-rule(8) , and table option of ip-route(8) Basic network tool - CLI 
+ip route - Tips (cont.) 
+--- PAGE 41 ---
+41
+41systemd-networkd 
+●System daemon  that manages network conﬁgurations 
+●Detects and conﬁgures network devices that matched some rules 
+○ Useful for container or VM network, as they may create virtual device dynamically. 
+○ It can also create virtual device. 
+●Use two kinds of network conﬁgurations 
+○.network : Conﬁgure network device 
+○.netdev : Automatically create virtual network device (at booting) 
+●Provide networkctl  as CLI to interact with daemon. 
+--- PAGE 42 ---
+42
+42Systemd-networkd 
+Syntax 
+●Each conﬁguration ﬁle contains multiple sections 
+○[<Section name>]  indicates the start of a section 
+●Each section contains one or more key-value pairs 
+○ Syntax: key=value 
+○ One line for one key-value pair. 
+○ Refer to manual for available section and corresponding keys. ( .network , .netdev )
+●Conﬁguration ﬁle should placed in /etc/systemd/network/  to be 
+recongnized by systemd-networkd 
+--- PAGE 43 ---
+43
+43Systemd-networkd 
+.network - Matching interface 
+●The .network  conﬁguration ﬁle will 
+only applied on matched interface .
+○ We need to speciﬁed rules for matching 
+interface. 
+■ Such rules should reside in [Match] 
+section. 
+○ Interface that satisfy all rules in [Match] 
+section will then be conﬁgured by that 
+conﬁg ﬁle. [Match] 
+Name=eth0 eth1 
+[Match] 
+Name=!br0 
+MACAddress=12:34:56:78:90:ab 
+Kind=Bridge [Match] 
+Name=eth* 
+--- PAGE 44 ---
+44
+44Systemd-networkd 
+.network - conﬁgure interface 
+●Every section except [Match] is used for conﬁguring interface. 
+●Sections you should know: 
+○ [Link] - corresponding with hardware properties of interface 
+○ [Address] - setting address of interface 
+○ [Route] - setting route of interface 
+○ [Network] - miscellaneous 
+■ Contains key about DNS, DHCP , LLDP , NTP , NAT , Address, Route, Gateway, 
+Master device (e.g. Master bridge), etc. 
+--- PAGE 45 ---
+45
+45Systemd-networkd 
+.network - [Link] example 
+[Link] 
+MACAddress=12:34:56:78:9A:BC 
+MTUBytes=1500 
+ActivationPolicy=always-up 
+●It will conﬁgure interface with: 
+○ Set its MAC address to 12:34:56:78:9A:BC 
+○ Set its MTU bytes to 1500B 
+○ Make it “always-up”. 
+■ Systemd-networkd will always try to set the administrative state  of interface to up. 
+--- PAGE 46 ---
+46
+46Systemd-networkd 
+.network - [Address] example 
+[Address] 
+Address=192.168.1.1/24 
+[Address] 
+Address=192.168.2.1/24 
+Broadcast=true 
+AddPrefixRoute=true 
+●multiple [Address] sections = multiple address is conﬁgured. 
+○ First will be 192.168.1.1/24, second will be 192.168.2.1/24 
+○Broadcast=true : broadcast address is auto derived from address. Default is true. 
+■ 192.168.1.255, 192.168.2.255 in this case. 
+○AddPrefixRoute=true : it will add a route based on address. Default is true. 
+■ Route with dst preﬁx 192.168.1.0/24 , 192.168.2.0/24 in this case. 
+--- PAGE 47 ---
+47
+47Systemd-networkd 
+.network - [Route] example 
+[Route] 
+Destination=192.168.3.0/24 
+Gateway=192.168.1.254 
+[Route] 
+Destination=0.0.0.0/0 
+Gateway=10.2.2.2 
+●multiple [Route] sections = multiple route is conﬁgured. 
+○ Route set by this way will go out through conﬁgured interface. 
+●For example, if eth0  is matched, this conﬁg will generated 2 routes: 
+■ default via 10.2.2.2 dev eth0 
+■ 192.168.3.0/24 via 192.168.1.254 dev eth0 
+--- PAGE 48 ---
+48
+48[Network] 
+Address=192.168.1.1/24 
+Address=192.168.2.1/24 
+Gateway=192.168.1.254/24 
+DNS=8.8.8.8 
+DHCPServer=yes 
+IPv4Forwarding=yes 
+[DHCPServer] 
+ServerAddress=192.168.1.1/24 ● Address: shorthand of [Address] section with only 
+Address key is speciﬁed 
+○ Speciﬁed multiple times = multiple addresses 
+● Gateway: shorthand of [Route] section with only Gateway 
+key is speciﬁed 
+○ It will be default route, since destination is not speciﬁed 
+● DNS: DNS server address 
+● DHCPServer: start a DHCP server on this interface 
+○ DHCP server address neet to specify in other section 
+● IPv4Forwarding: enable packet forwarding on this 
+interface Systemd-networkd 
+.network - [Network] example 
+--- PAGE 49 ---
+49
+49Systemd-networkd 
+.network - Naming 
+●systemd-networkd process conﬁgurations ﬁle in ﬁlename lexicographic 
+orders 
+○ That is, bar.network  will be processed before foo.network 
+●In convention, we preﬁx ﬁlename with 2 digits. 
+○ E.g. 40-foo.network 
+○ This way, we can easily tell the priority of each conﬁguration ﬁle 
+●Note that interface can be conﬁgured with only ﬁrst matched 
+conﬁguration ﬁle. 
+○ When an interface is matched by multiple conﬁguration ﬁles: 
+■ The interface will only conﬁgured by the ﬁle with higher priority 
+--- PAGE 50 ---
+50
+50Systemd-networkd 
+networkctl 
+●A CLI tool for interacting with systemd-networkd 
+●networkctl  or networkctl list:  list interface and their status. 
+●networkctl status <interface>:  print detailed status of a interface 
+●networkctl reload:  reload conﬁguration. 
+--- PAGE 51 ---
+51
+51Systemd-networkd 
+networkctl - Interface Status 
+●In the output of networkctl , you will see operational and setup status 
+
+--- PAGE 52 ---
+52
+52●off : powered oﬀ 
+●no-carrier : powered on but has no carrier 
+○ e.g. for a ethernet interface, no-carrier means 
+unplugged 
+●degraded : has carrier but is not routable yet. 
+○ Deﬁnitely  cannot  go beyond the local network. 
+○ e.g. has address but no gateway 
+●routable 
+○ Possibly  can  reach external network 
+Systemd-networkd 
+networkctl - Interface Status Details 
+--- PAGE 53 ---
+53
+53Systemd-networkd 
+Troubleshooting 
+●If a network conﬁguration seems does not applied: 
+○ Check output of networkctl  for status 
+○ Check output of networkctl status <interface>  for more detailed information 
+■ Especially checked which conﬁguration ﬁle is applied on such interface 
+○ Use journalctl -u systemd-networkd  to check log of daemon 
+○ Use net tools we discussed in previous chapter to diagnosis network 
+--- PAGE 54 ---
+54
+54Lab “A computer is like air 
+conditioning ‒ it becomes 
+useless when you open 
+Windows.” 
+‒ Linus Torvarlds 
+--- PAGE 55 ---
+55
+55Lab 1 
+●In this lab, we will create pseudo-container network environment 
+○ Pseudo: we are not going to use Docker, LXC or nspawn to spawn namespace 
+○ Instead, we will use ip-netns(8) 
+●We will simulate 3 environment, and test their connectivity 
+○ Lab1-1: directly connect 2 namespace within same subnet, with veth pair. 
+○ Lab1-2: connect 2 ns within same subnet, through a bridge. 
+○ Lab1-3: connect 2 ns within diﬀerent subnet, and create a ns to be router. 
+--- PAGE 56 ---
+56
+56Lab 1-1 
+●In this part, we will create 2 network namespace. 
+●We will create veth pair by ip command, providing connection across 
+network namespace. 
+--- PAGE 57 ---
+57
+57Lab 1-1 
+Topology 
+
+--- PAGE 58 ---
+58
+58Lab 1-1 
+Create Namespace 
+●ip netns add  NS_NAME 
+○ create a new named network namespace, named as NS_NAME 
+●ip netns delete  NS_NAME 
+○ delete the named network namespace 
+●ip -all  netns delete 
+○ delete all named network namespaces 
+●ip netns exec  NS_NAME  cmd
+○ Run cmd  in the named network namespace 
+○ e.g. ip netns exec NS1 bash  = run bash in NS1 
+--- PAGE 59 ---
+59
+59Lab 1-1 
+Experiment Commands 
+sudo ip netns add NS1 
+sudo ip netns add NS2 
+sudo ip link add name veth11 netns NS1 type veth peer name veth22 netns NS2 
+●create 2 net NS 
+●add veth pair 
+○ assigned one end to NS1 
+○ another end to NS2 
+--- PAGE 60 ---
+60
+60Lab 1-1 
+Experiment Commands 
+# use “sudo ip netns exec NS1 (or NS2) bash”  to enter NS1 (or NS2) 
+# use “exit”  to leave NS 
+#at netns1 
+ip addr add 192.168.100.1/24 brd 192.168.100.255 dev veth11 
+ip link set veth11 up 
+ip link set lo up 
+#at netns2 
+ip addr add 192.168.100.2/24 brd 192.168.100.255 dev veth22 
+ip link set veth22 up 
+ip link set lo up 
+●assigned ip to both veth, and bring them up 
+--- PAGE 61 ---
+61
+61
+
+--- PAGE 62 ---
+62
+62Lab 1-1 
+Testing 
+#at netns1 
+ping 192.168.100.2 
+#at netns2 
+ping 192.168.100.1 
+#at main namespace 
+lsns -t net -t uts 
+# after testing, remember cleaning up 
+sudo ip -all netns delete 
+●test connectivity between namespaces. 
+●list existing namespace. 
+
+--- PAGE 63 ---
+63
+63
+
+--- PAGE 64 ---
+64
+64
+
+--- PAGE 65 ---
+65
+65Lab 1-2 
+●In this part, we will create one more namespace, ns3 
+●We will create a bridge at ns3 
+●We will connect ns1 and ns3, then ns2 and ns3 
+●Although not directly connected, we can make ns1 reach ns2, by bridge at 
+ns3
+--- PAGE 66 ---
+66
+66Lab 1-2 
+Topology 
+
+--- PAGE 67 ---
+67
+67Lab 1-2 
+Experiment command 
+sudo ip netns add NS1 
+sudo ip netns add NS2 
+sudo ip netns add NS3 
+sudo ip link add name veth11 netns NS1 type veth peer name veth13 netns NS3 
+sudo ip link add name veth22 netns NS2 type veth peer name veth23 netns NS3 
+--- PAGE 68 ---
+68
+68Lab 1-2 
+Experiment command 
+# at netns3 
+ip link add name br0 type bridge 
+ip link set veth13 master br0 
+ip link set veth23 master br0 
+ip link set veth13 up 
+ip link set veth23 up 
+ip link set br0 up 
+# at netns1 
+ip addr add 192.168.100.1/24 brd 192.168.100.255 dev veth11 
+ip link set veth11 up 
+ip link set lo up 
+# at netns2 
+ip addr add 192.168.100.2/24 brd 192.168.100.255 dev veth22 
+ip link set veth22 up 
+ip link set lo up 
+
+--- PAGE 69 ---
+69
+69Lab 1-2 
+Testing 
+#at netns1 
+ping 192.168.100.2 
+#at netns2 
+ping 192.168.100.1 
+#at netns3 
+ip link set dev veth23 nomaster 
+#at netns1 
+ping 192.168.100.2 
+# after testing, remember cleaning up 
+sudo ip -all netns delete 
+●Test connectivity 
+●Unplugged veth from bridge, and check connectivity again. 
+--- PAGE 70 ---
+70
+70
+
+--- PAGE 71 ---
+71
+71Lab 1-3 
+●In this part, we create yet one more namespace, ns4. 
+●We want to assigned ns1 and ns2 to diﬀerent subnet 
+●We conﬁgure ns4 as router, ns1 and ns2 will use interface in ns4 as 
+gateway. 
+●We will make ns1 can ping to ns2 via ns4 
+●Also, ns1, ns2, ns4 will not directly connect. But connect by bridge, in ns3. 
+--- PAGE 72 ---
+72
+72Lab 1-3 
+Topology 
+
+--- PAGE 73 ---
+73
+73Lab 1-3 
+Experiment command 
+# enable ip forwarding 
+sysctl -w net.ipv4.ip_forward=1 
+sudo ip netns add NS1 
+sudo ip netns add NS2 
+sudo ip netns add NS3 
+sudo ip netns add NS4 
+sudo ip link add name veth11 netns NS1 type veth peer name veth13 netns NS3 
+sudo ip link add name veth22 netns NS2 type veth peer name veth23 netns NS3 
+sudo ip link add name veth441 netns NS4 type veth peer name veth431 netns NS3 
+sudo ip link add name veth442 netns NS4 type veth peer name veth432 netns NS3 
+--- PAGE 74 ---
+74
+74Lab 1-3 
+Experiment command 
+# at netns3 
+ip link add name br0 type bridge 
+ip link set veth13 master br0 
+ip link set veth23 master br0 
+ip link set veth431 master br0 
+ip link set veth432 master br0 
+ip link set veth13 up 
+ip link set veth23 up 
+ip link set veth431 up 
+ip link set veth432 up 
+ip link set br0 up 
+--- PAGE 75 ---
+75
+75Lab 1-3 
+Experiment command 
+# at netns4 
+ip addr add 192.168.100.254/24 brd 192.168.100.255 dev veth441 
+ip addr add 192.168.200.254/24 brd 192.168.200.255 dev veth442 
+ip link set veth441 up 
+ip link set veth442 up 
+ip link set lo up 
+●We do not need to further add route, as add address will automatically 
+add corresponding preﬁx on-link route. 
+--- PAGE 76 ---
+76
+76Lab 1-3 
+Experiment command 
+# at netns1 
+ip addr add 192.168.100.1/24 brd 192.168.100.255 dev veth11 
+ip link set veth11 up 
+ip link set lo up 
+ip route add default via 192.168.100.254 dev veth11 
+# at netns2 
+ip addr add 192.168.200.2/24 brd 192.168.200.255 dev veth22 
+ip link set veth22 up 
+ip link set lo up 
+ip route add default via 192.168.200.254 dev veth22 
+●Make them using interface in ns4 (router interface) as default gateway 
+--- PAGE 77 ---
+77
+77Lab 1-3 
+Testing 
+#at netns4 
+sudo tcpdump -i veth441 
+#at netns1 
+ping 192.168.200.2 
+#at netns2 
+ping 192.168.100.1 
+# after testing, remember cleaning up 
+sudo ip -all netns delete 
+●Monitor on veth441, see if traﬃc actually go through the gateway. 
+●Test connectivity, especially test if diﬀerent subnet can reach each other 
+--- PAGE 78 ---
+78
+78
+
+--- PAGE 79 ---
+79
+79Lab 2 
+●In this lab, we will create a VM network with 2 VMs 
+○ We will use QEMU to run VM. 
+●To communicate with VM, we use tap interface. 
+○ For simplicity, just consider it as Veth pair 
+■ But between VM and host, instead of NSs. 
+■ Or, think of it as a tunnel 
+○ On host side, it is named tapx . On VM side, it is named ethx .
+○ Packet at host side sent to tapx  will appear on ethx  inside VM. vice versa. 
+●We will focus on using systemd-networkd to manage network of VM                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+--- PAGE 80 ---
+80
+80●To make it simple, we will not cover QEMU in detailed here. 
+●On classroom PC, inside  ~/vm , We have prepared you a script to start VM 
+●Type  sudo ./{vm1|vm2}.sh  to boot vm 1 or vm 2 
+●vncviewer :5901   to connect to vm1 
+○ and vncviewer :5902  to vm2 
+●If you want to try the lab at home, you can get the VM qcow2 and script via 
+this link Lab 2
+Start and connect to VM 
+--- PAGE 81 ---
+81
+81Lab 2
+Topology 
+●VM1 and VM2 on the same private LAN 
+○192.168.1.0/24 
+●VM2 eth1 is DHCP server 
+○Other interfaces are DHCP clients 
+●br0 is default gateway of this LAN 
+
+--- PAGE 82 ---
+82
+82●We will use systmed-networkd to achieve this topology 
+○ On host, conﬁguring tap0,1,2  and br0
+○ On VM1 & VM2, conﬁguring ethx 
+●Test if VM can connect each other. 
+●And if VM can reach external network. Lab 2
+Target 
+--- PAGE 83 ---
+83
+83Lab 2
+Creating interface @Host 
+[NetDev] 
+Name=br0 
+Kind=bridge [NetDev] 
+Name=tap0 
+Kind=tap 
+in ﬁle 10-br0 .netdev in ﬁle 10-tap0 .netdev 
+[NetDev] 
+Name=tap1 
+Kind=tap [NetDev] 
+Name=tap2 
+Kind=tap 
+in ﬁle 10-tap1 .netdev in ﬁle 10-tap2 .netdev ● A .netdev is very similar to .network 
+● Automatically create a virtual network 
+device. 
+○ Must provide Name  and Kind  of interface 
+● These ﬁle should only create on Host 
+○ as “@Host”implies 
+○ all the conﬁguration ﬁles should resides 
+in /etc/systemd/network/ 
+--- PAGE 84 ---
+84
+84[Match] 
+Name=tap* 
+[Link] 
+Promiscuous=yes 
+[Network] 
+Bridge=br0 Lab 2
+Conﬁguring Tap @Host 
+● in 15-tap.network 
+● Match by name 
+● [Link] 
+○ Set promisc mode 
+○ Make interface capturing all packets 
+■ regardless of their destination 
+■ instead of only packet addressed 
+itself. 
+● [Network] 
+○ Make them attached to br0 
+--- PAGE 85 ---
+85
+85[Match] 
+Name=br0 
+[Network] 
+Address=192.168.1.254/24 
+IPv4Forwarding=yes 
+IPMasquerade=yes Lab 2
+Conﬁguring Bridge @Host 
+● in 15-br0.network 
+● Match by name 
+● [Network] 
+○ Assigned static IP 
+○ Explicitly allow IP forwarding 
+○ Enable IPMasquerade 
+■ When forwarding packet, perform 
+src NAT on packet. 
+--- PAGE 86 ---
+86
+86
+
+--- PAGE 87 ---
+87
+87[Match] 
+Name=eth* 
+MACAddress=08:00:01:87:87:92 
+[Network] 
+DHCPServer=yes 
+Address=192.168.1.100/24 
+Gateway=192.168.1.254 
+[DHCPServer] 
+ServerAddress=192.168.1.100/24 
+EmitRouter=yes 
+Router=192.168.1.254 Lab 2
+DHCP server @VM2 
+● in 15-DHCP-server.network 
+● Match by MAC address 
+● [Network] 
+○ Setup address and gateway 
+○ Enable DHCP server 
+● [DHCPServer] 
+○ Set address to run DHCP server 
+○ conﬁgure ip address the server should 
+lease 
+○ Make DHCP server emit default router to 
+client. 
+--- PAGE 88 ---
+88
+88[Match] 
+Name=eth* 
+[Network] 
+DHCP=yes 
+[DHCPv4] 
+ClientIdentifier=mac 
+UseRoutes=yes Lab 2
+DHCP Client @VM1 and @VM2 
+● in 20-DHCP-client.network 
+● Match any other interface with name 
+start with “eth” 
+● [Network] 
+○ Enable DHCP 
+● [DHCPv4] 
+○ Make it accept route sent by DHCP server 
+○ Use interface MAC as client ID 
+● Note that @VM2, UseRoutes should be 
+No
+--- PAGE 89 ---
+89
+89VM1 
+
+--- PAGE 90 ---
+90
+90VM2 
+
+--- PAGE 91 ---
+91
+91●These ﬁle should be placed under /etc/systemd/network 
+●Copy to QEMU VM through VNC viewer is impossible, so you need to write 
+them manually. 
+●Run sudo networkctl reload  to make conﬁguration take eﬀect. Lab 2
+Experiment 
+--- PAGE 92 ---
+92
+92●Check if both VM1 and VM2 got ip from DHCP server 
+●Check if all interface in VM1 and VM2 can reach each other 
+●Check if they VM1 and VM2 can reach gateway. i.e. br0 
+●Check if VM1 and VM2 can reach external network Lab 2
+Testing 
+--- PAGE 93 ---
+93
+93Review 
+●What have we learned in this (perhaps painful) 2.5 hours? 
+○ Why should we learn network management of Linux 
+○ Useful network tool for Linux 
+■ ping, traceroute, nmap, iperf, tcpdump, dig, ssh 
+○  How to use iproute2 for temporarily conﬁguring network 
+■ conﬁgure address, routing table, or creating virtual device. 
+○ How to use systemd-networkd to conﬁgure network and make it persistent. 
+■ syntax of conﬁguration ﬁle, and how to match interface. 
+■ location and naming rule of ﬁles, and how to check status of daemon. 
+○ Two lab to actually play with these 2 network management tools. 

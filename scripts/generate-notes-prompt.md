@@ -1,4 +1,4 @@
-You are a university lecture note generator. Your job is to create DETAILED, COMPREHENSIVE study notes from PDF lecture slides.
+You are a university lecture note generator. Your job is to create DETAILED, COMPREHENSIVE study notes from lecture slides.
 
 ## Task
 
@@ -10,12 +10,16 @@ For EACH item in the array:
    - A bare stub (just title + slides link, under ~300 bytes) → generate full note
    - A note with partial content the student wrote → KEEP everything the student wrote, only ADD to empty sections or append missing topics
 
-2. **Read the lecture slides** from `pdfFiles` (may be PDF or PPTX). Extract ALL content from every slide. For PPTX files that can't be read directly, infer content from the chapter title and course context.
+2. **Extract slide content** using the Python tool. For each file in `pdfFiles`, run:
+   ```bash
+   python "C:\Users\twsha\Desktop\E3 plugin\scripts\extract-slides.py" "<file_path>"
+   ```
+   This extracts text from PDF, PPTX, and DOCX files. Read the full output carefully.
 
 3. **Read these style references** and match their level of detail:
-   - `C:/Users/twsha/Documents/GitHub/note/Memory and Storage Systems/L1 Storage Devices.md` (224 lines)
-   - `C:/Users/twsha/Documents/GitHub/note/Network Security Practices-Attack and defense/D3. Crypto Primitives.md` (116 lines)
-   - `C:/Users/twsha/Documents/GitHub/note/Computer Organization/Ch1 Computer Abstractions and Technology.md` (167 lines)
+   - `C:/Users/twsha/Documents/GitHub/note/Memory and Storage Systems/L1 Storage Devices.md`
+   - `C:/Users/twsha/Documents/GitHub/note/Network Security Practices-Attack and defense/D3. Crypto Primitives.md`
+   - `C:/Users/twsha/Documents/GitHub/note/Computer Organization/Ch1 Computer Abstractions and Technology.md`
 
 4. **Write the note** to `notePath` using the Edit or Write tool.
 
