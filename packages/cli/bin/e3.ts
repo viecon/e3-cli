@@ -18,6 +18,8 @@ import { registerStatusCommand } from '../src/commands/status.js';
 import { registerOpenCommand } from '../src/commands/open.js';
 import { registerExportCommand } from '../src/commands/export.js';
 import { registerConfigCommand } from '../src/commands/config.js';
+import { registerDiffCommand } from '../src/commands/diff.js';
+import { registerCompletionsCommand } from '../src/commands/completions.js';
 
 const program = new Command();
 
@@ -43,5 +45,7 @@ registerStatusCommand(program);
 registerOpenCommand(program);
 registerExportCommand(program);
 registerConfigCommand(program);
+registerDiffCommand(program);
+registerCompletionsCommand(program);
 
 program.parse();
