@@ -4,7 +4,16 @@
 const fs = require('fs');
 const path = require('path');
 
-const vault = process.argv[2] || 'C:\\Users\\twsha\\Documents\\GitHub\\note';
+// Read vault path from ~/.e3.env or use default
+function getVaultFromEnv() {
+  try {
+    const raw = require('fs').readFileSync(require('path').join(require('os').homedir(), '.e3.env'), 'utf-8');
+    const match = raw.match(/^VAULT_PATH=(.+)$/m);
+    if (match) return match[1].trim();
+  } catch {}
+  return 'C:\\Users\\twsha\\Documents\\GitHub\\note';
+}
+const vault = process.argv[2] || getVaultFromEnv();
 const THRESHOLD = 300; // bytes - stubs and near-empty notes
 const excludeDirs = ['Calendar', 'assets', 'daily', '.obsidian', '.git', '留學'];
 

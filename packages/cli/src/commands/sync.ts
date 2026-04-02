@@ -10,9 +10,9 @@ import {
   getPendingAssignmentsViaCalendar,
 } from '@e3/core';
 import type { CourseSection } from '@e3/core';
-import { loadConfig, getBaseUrl, requireAuth } from '../config.js';
+import { loadConfig, getBaseUrl, requireAuth, tryRelogin, getVaultPath } from '../config.js';
 
-const DEFAULT_VAULT = 'C:\\Users\\twsha\\Documents\\GitHub\\note';
+// Vault path from ~/.e3.env or default
 
 // 排除的課程
 const EXCLUDED_COURSES = [
@@ -131,18 +131,29 @@ export function registerSyncCommand(program: Command): void {
   program
     .command('sync')
     .description('自動同步 E3 講義和作業到 Obsidian')
-    .option('--vault <path>', 'Obsidian vault 路徑', DEFAULT_VAULT)
+    .option('--vault <path>', 'Obsidian vault 路徑', getVaultPath())
     .option('--dry-run', '只顯示會做什麼，不實際寫入')
     .option('--json', 'JSON 格式輸出（列出新下載的講義，供 AI 生成筆記）')
     .action(async (opts) => {
       try {
         requireAuth();
-        const config = loadConfig();
-        const client = new MoodleClient({
+        let config = loadConfig();
+        let client = new MoodleClient({
           token: config.token,
           sessionCookie: config.session,
           baseUrl: getBaseUrl(),
         });
+
+        // Verify token works, auto-relogin if expired
+        try {
+          await getEnrolledCourses(client, 'inprogress');
+        } catch {
+          const newToken = await tryRelogin();
+          if (newToken) {
+            config = loadConfig();
+            client = new MoodleClient({ token: newToken, baseUrl: getBaseUrl() });
+          }
+        }
 
         const vault = opts.vault;
         const dryRun = opts.dryRun ?? false;

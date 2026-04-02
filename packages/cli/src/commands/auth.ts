@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import ora from 'ora';
 import { getSiteInfo, MoodleClient, getEnrolledCourses } from '@e3/core';
-import { saveConfig, clearConfig, loadConfig, getBaseUrl } from '../config.js';
+import { saveConfig, clearConfig, loadConfig, getBaseUrl, saveCredentials, getCredentials } from '../config.js';
 
 export function registerAuthCommands(program: Command): void {
   program
@@ -10,15 +10,58 @@ export function registerAuthCommands(program: Command): void {
     .description('登入 E3 系統')
     .option('--token <token>', '使用 Moodle web service token 登入')
     .option('--session <cookie>', '使用 MoodleSession cookie 登入（從瀏覽器複製）')
+    .option('-u, --username <user>', 'E3 帳號（直接用帳密取得 token）')
+    .option('-p, --password <pass>', 'E3 密碼')
     .action(async (opts) => {
       try {
         const baseUrl = getBaseUrl();
+
+        // Username + password login
+        if (opts.username && opts.password) {
+          const spinner = ora('用帳密取得 token...').start();
+          const loginUrl = new URL('/login/token.php', baseUrl);
+          const body = new URLSearchParams({
+            username: opts.username,
+            password: opts.password,
+            service: 'moodle_mobile_app',
+          });
+          const res = await fetch(loginUrl.toString(), { method: 'POST', body });
+          const data = await res.json() as { token?: string; error?: string };
+
+          if (!data.token) {
+            spinner.fail(`登入失敗: ${data.error ?? '未知錯誤'}`);
+            console.log(chalk.yellow('如果 E3 要求二階段驗證，請到 E3 設定中放寬為「新裝置才需要」'));
+            process.exit(1);
+          }
+
+          const client = new MoodleClient({ token: data.token, baseUrl });
+          const info = await getSiteInfo(client);
+          spinner.succeed(`登入成功！歡迎 ${chalk.bold(info.fullname)}`);
+
+          saveConfig({
+            token: data.token,
+            authMode: 'token',
+            userid: info.userid,
+            fullname: info.fullname,
+            baseUrl,
+          });
+          saveCredentials(opts.username, opts.password);
+
+          console.log(chalk.gray('Token 已儲存至 ~/.e3rc.json'));
+          console.log(chalk.gray('帳密已儲存至 ~/.e3.env (chmod 600)'));
+          console.log(chalk.green('✓ Token 過期時會自動用帳密重新取得'));
+          return;
+        }
 
         if (!opts.token && !opts.session) {
           console.log(chalk.bold('\n📋 E3 登入方式\n'));
           console.log('因為 E3 使用交大 SSO + 二階段驗證，需要手動取得認證資訊：\n');
 
-          console.log(chalk.cyan('方式 1: MoodleSession Cookie（推薦）'));
+          console.log(chalk.cyan('方式 1: 帳號密碼（推薦，支援自動重登）'));
+          console.log(`  執行: ${chalk.green('e3 login -u <帳號> -p <密碼>')}`);
+          console.log('  需要在 E3 設定中將二階段驗證改為「新裝置才需要」\n');
+
+          console.log(chalk.cyan('方式 2: MoodleSession Cookie'));
           console.log('  1. 在瀏覽器登入 E3 (https://e3p.nycu.edu.tw)');
           console.log('  2. 按 F12 開啟開發者工具 → Application → Cookies');
           console.log('  3. 找到 MoodleSession 的值');
