@@ -1,14 +1,20 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { exec } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import { MoodleClient, getEnrolledCourses } from '@e3/core';
 import { loadConfig, getBaseUrl, requireAuth } from '../config.js';
 
 function openUrl(url: string): void {
-  const cmd = process.platform === 'win32' ? `start "" "${url}"`
-    : process.platform === 'darwin' ? `open "${url}"`
-    : `xdg-open "${url}"`;
-  exec(cmd);
+  // Validate URL to prevent command injection
+  try { new URL(url); } catch { return; }
+
+  if (process.platform === 'win32') {
+    execFile('cmd', ['/c', 'start', '', url]);
+  } else if (process.platform === 'darwin') {
+    execFile('open', [url]);
+  } else {
+    execFile('xdg-open', [url]);
+  }
 }
 
 export function registerOpenCommand(program: Command): void {
