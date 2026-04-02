@@ -47,6 +47,10 @@ e3 config get                # 查看設定
 e3 config set vaultPath "..."        # 設定 Obsidian vault 路徑
 e3 config set excludedCourses "..."  # 設定排除課程
 
+# 比較與工具
+e3 diff                      # 比對 E3 與本地 vault 差異
+e3 completions bash          # 產生 shell 自動補全腳本
+
 # Obsidian 同步
 e3 sync                      # 同步講義 + 作業到 Obsidian vault
 ```
@@ -55,11 +59,12 @@ e3 sync                      # 同步講義 + 作業到 Obsidian vault
 
 ## 瀏覽器 Extension (Chrome + Zen Browser)
 
-- **快速面板** — E3 頁面右下角按鈕，展開顯示未繳作業和課程連結，直接跳轉
+- **Command Palette (Ctrl+Shift+K)** — 在 E3 任何頁面快速搜尋跳轉到課程、作業、頁面
+- **Dark Mode** — E3 網站深色模式，可手動切換（Auto/Dark/Light）
+- **快速面板** — E3 頁面右下角按鈕，展開顯示未繳作業和課程連結
 - **批次下載** — 課程頁面一鍵下載所有教材
 - **截止日提醒** — 首頁自動提醒 7 天內到期的作業
-- **作業提示** — 作業提交頁面提示批次上傳功能
-- **Popup** — 未繳作業列表 + 課程列表
+- **Popup** — 未繳作業列表 + 課程列表 + dark mode 切換
 - **Side Panel** — 完整功能面板（作業/課程/公告/行事曆/成績/通知）
 - **Badge** — Toolbar icon 顯示未繳作業數量
 
@@ -120,7 +125,7 @@ node packages/cli/dist/bin/e3.js login -u <帳號>
 ```
 packages/
   core/          — 共享 Moodle API 客戶端（REST + AJAX + 頁面爬取）
-  cli/           — CLI 工具（21 個指令）
+  cli/           — CLI 工具（24 個指令）
   extension/     — 瀏覽器 Extension（WXT + React + Tailwind）
 scripts/
   e3-sync.bat    — 自動同步 workflow

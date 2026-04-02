@@ -1,11 +1,11 @@
 # E3 Assistant
 
-NYCU E3 LMS 助手工具，包含瀏覽器 Extension、CLI 工具（21 個指令）和 Claude Code Skills。
+NYCU E3 LMS 助手工具，包含瀏覽器 Extension、CLI 工具（24 個指令）和 Claude Code Skills。
 
 ## 專案結構
 
 - `packages/core/` - 共享 Moodle API 客戶端 (TypeScript library)
-- `packages/cli/` - CLI 工具 (21 個指令)
+- `packages/cli/` - CLI 工具 (24 個指令)
 - `packages/extension/` - 瀏覽器 Extension (Chrome + Firefox/Zen, WXT + React)
 - `scripts/` - 自動化 workflow (sync + AI note generation)
 - `.claude/skills/` - Claude Code Skills (16 個)
