@@ -38,6 +38,15 @@ e3 news                      # 課程公告
 e3 updates                   # 課程最近更新
 e3 notifications             # 系統通知
 
+# 匯出
+e3 export grades -o grades.csv       # 成績匯出 CSV
+e3 export assignments -o hw.csv      # 作業匯出 CSV
+
+# 設定
+e3 config get                # 查看設定
+e3 config set vaultPath "..."        # 設定 Obsidian vault 路徑
+e3 config set excludedCourses "..."  # 設定排除課程
+
 # Obsidian 同步
 e3 sync                      # 同步講義 + 作業到 Obsidian vault
 ```
@@ -51,7 +60,7 @@ e3 sync                      # 同步講義 + 作業到 Obsidian vault
 - **截止日提醒** — 首頁自動提醒 7 天內到期的作業
 - **作業提示** — 作業提交頁面提示批次上傳功能
 - **Popup** — 未繳作業列表 + 課程列表
-- **Side Panel** — 完整功能面板（作業/課程/行事曆/成績）
+- **Side Panel** — 完整功能面板（作業/課程/公告/行事曆/成績/通知）
 - **Badge** — Toolbar icon 顯示未繳作業數量
 
 ## Obsidian 自動同步 Workflow
@@ -66,19 +75,26 @@ scripts/e3-sync.bat          # 完整 workflow（下載 + AI 生成筆記）
 4. Claude Code 讀取內容生成結構化筆記
 5. Token 過期時自動用帳密重新登入
 
-設定檔：`~/.e3.env`（帳密 + vault 路徑）、`~/.e3rc.json`（token）
+設定檔：`~/.e3.env`（帳密）、`~/.e3rc.json`（token + vault 路徑 + 排除設定）
+用 `e3 config` 管理設定。
 
 ## Claude Code Skills
 
 ```
-/e3-status      — 總覽
-/e3-courses     — 課程
-/e3-assignments — 作業
-/e3-news        — 公告
-/e3-download    — 下載
-/e3-upload      — 上傳
-/e3-grades      — 成績
-/e3-sync        — Obsidian 同步 + AI 筆記
+/e3-status        — 總覽
+/e3-courses       — 課程
+/e3-assignments   — 作業
+/e3-submission    — 作業提交詳情
+/e3-news          — 公告
+/e3-updates       — 課程更新
+/e3-notifications — 通知
+/e3-download      — 下載
+/e3-upload        — 上傳
+/e3-grades        — 成績
+/e3-export        — 匯出 CSV
+/e3-open          — 開啟 E3 頁面
+/e3-config        — 設定管理
+/e3-sync          — Obsidian 同步 + AI 筆記
 ```
 
 ## 安裝
@@ -97,14 +113,14 @@ pnpm install && pnpm build
 node packages/cli/dist/bin/e3.js login -u <帳號>
 ```
 
-需要 Node.js 18+、pnpm、Python 3（投影片提取）。
+需要 Node.js 22+（見 .nvmrc）、pnpm、Python 3（投影片提取）。
 
 ## 專案結構
 
 ```
 packages/
   core/          — 共享 Moodle API 客戶端（REST + AJAX + 頁面爬取）
-  cli/           — CLI 工具（16 個指令）
+  cli/           — CLI 工具（21 個指令）
   extension/     — 瀏覽器 Extension（WXT + React + Tailwind）
 scripts/
   e3-sync.bat    — 自動同步 workflow
