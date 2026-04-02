@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, unlinkSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join, dirname } from 'node:path';
 
@@ -28,11 +28,13 @@ export function loadConfig(): E3Config {
 
 export function saveConfig(config: E3Config): void {
   mkdirSync(dirname(CONFIG_PATH), { recursive: true });
-  writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2), 'utf-8');
+  writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2), { encoding: 'utf-8', mode: 0o600 });
 }
 
 export function clearConfig(): void {
   saveConfig({});
+  // Also remove credentials
+  try { unlinkSync(ENV_PATH); } catch { /* ignore if doesn't exist */ }
 }
 
 export function getAuthHeaders(): Record<string, string> {

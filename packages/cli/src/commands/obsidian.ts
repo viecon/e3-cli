@@ -124,7 +124,8 @@ export function registerObsidianCommand(program: Command): void {
           await obsidianPut(obsConfig, `${coursePath}/課程大綱.md`, lines.join('\n'));
 
           // Sync pending assignments
-          const pending = await getPendingAssignmentsViaCalendar(client, 90);
+          const allPending = await getPendingAssignmentsViaCalendar(client, 90);
+          const pending = allPending.filter(a => a.courseId === cid);
           if (pending.length > 0) {
             const assignLines: string[] = [
               `---`,

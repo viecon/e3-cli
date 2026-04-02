@@ -67,12 +67,12 @@ export function registerAuthCommands(program: Command): void {
           console.log('  3. 找到 MoodleSession 的值');
           console.log(`  4. 執行: ${chalk.green('e3 login --session <cookie值>')}\n`);
 
-          console.log(chalk.cyan('方式 2: Web Service Token'));
+          console.log(chalk.cyan('方式 3: Web Service Token'));
           console.log('  1. 登入 E3 後到個人偏好設定 → 安全金鑰');
           console.log('  2. 建立新的 token');
           console.log(`  3. 執行: ${chalk.green('e3 login --token <token值>')}\n`);
 
-          console.log(chalk.cyan('方式 3: 使用瀏覽器 Extension'));
+          console.log(chalk.cyan('方式 4: 使用瀏覽器 Extension'));
           console.log('  安裝 E3 助手 Extension 後，它會自動偵測登入狀態\n');
 
           return;

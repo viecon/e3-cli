@@ -1,5 +1,5 @@
 import type { UserGradeReport } from './types.js';
-import { MoodleClient } from './client.js';
+import { MoodleClient, MoodleApiError } from './client.js';
 
 /**
  * Get grade items for a specific course.
@@ -13,6 +13,9 @@ export async function getCourseGrades(
     'gradereport_user_get_grade_items',
     { courseid, userid },
   );
+  if (!result.usergrades?.length) {
+    throw new MoodleApiError('no_grades', '此課程沒有成績資料');
+  }
   return result.usergrades[0];
 }
 

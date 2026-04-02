@@ -85,10 +85,16 @@ def main():
     try:
         if ext == ".pdf":
             print(extract_pdf(path))
-        elif ext in (".pptx", ".ppt"):
+        elif ext == ".pptx":
             print(extract_pptx(path))
-        elif ext in (".docx", ".doc"):
+        elif ext == ".ppt":
+            print(f"Warning: .ppt (legacy format) is not supported. Only .pptx works.", file=sys.stderr)
+            print(f"# {os.path.splitext(os.path.basename(path))[0]}\n\n(Legacy .ppt format — content extraction not available)")
+        elif ext == ".docx":
             print(extract_docx(path))
+        elif ext == ".doc":
+            print(f"Warning: .doc (legacy format) is not supported. Only .docx works.", file=sys.stderr)
+            print(f"# {os.path.splitext(os.path.basename(path))[0]}\n\n(Legacy .doc format — content extraction not available)")
         else:
             print(f"Error: unsupported format: {ext}", file=sys.stderr)
             sys.exit(1)
