@@ -10,34 +10,35 @@ import {
   getPendingAssignmentsViaCalendar,
 } from '@e3/core';
 import type { CourseSection } from '@e3/core';
-import { loadConfig, getBaseUrl, requireAuth, tryRelogin, getVaultPath } from '../config.js';
+import { loadConfig, getBaseUrl, requireAuth, tryRelogin, getVaultPath, getExcludedCourses, getExcludedExtensions } from '../config.js';
 import { safeJoin, sanitizeFilename } from '../sanitize.js';
 import { stripHtml } from '../html.js';
 import { createClient } from '../createClient.js';
 
-// Vault path from ~/.e3.env or default
-
-// 排除的課程
-const EXCLUDED_COURSES = [
+// Default exclusions (used when config has none)
+const DEFAULT_EXCLUDED_COURSES = [
   '服務學習', 'Service Learning',
   '高效能計算概論', 'High-Performance Computing',
   '日文', 'Japanese',
   'Gender Equity', '性別平等',
 ];
 
-// 排除的檔案類型
-const EXCLUDED_EXTENSIONS = ['mp4', 'mkv', 'avi', 'mov', 'wmv', 'flv', 'pkt'];
+const DEFAULT_EXCLUDED_EXTENSIONS = ['mp4', 'mkv', 'avi', 'mov', 'wmv', 'flv', 'pkt'];
 
 // 講義檔案類型
 const SLIDE_EXTENSIONS = ['pdf', 'pptx', 'ppt', 'docx', 'doc', 'xlsx'];
 
 function isExcludedCourse(fullname: string): boolean {
-  return EXCLUDED_COURSES.some(k => fullname.toLowerCase().includes(k.toLowerCase()));
+  const exclusions = getExcludedCourses();
+  const list = exclusions.length > 0 ? exclusions : DEFAULT_EXCLUDED_COURSES;
+  return list.some(k => fullname.toLowerCase().includes(k.toLowerCase()));
 }
 
 function isExcludedFile(filename: string): boolean {
+  const exclusions = getExcludedExtensions();
+  const list = exclusions.length > 0 ? exclusions : DEFAULT_EXCLUDED_EXTENSIONS;
   const ext = filename.split('.').pop()?.toLowerCase() ?? '';
-  return EXCLUDED_EXTENSIONS.includes(ext);
+  return list.includes(ext);
 }
 
 function isSlideFile(filename: string): boolean {

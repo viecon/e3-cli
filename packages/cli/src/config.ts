@@ -13,6 +13,12 @@ interface E3Config {
   fullname?: string;
   sesskey?: string;
   baseUrl?: string;
+  /** Obsidian vault path */
+  vaultPath?: string;
+  /** Course names to exclude from sync (partial match) */
+  excludedCourses?: string[];
+  /** File extensions to exclude from download (e.g. mp4, mkv) */
+  excludedExtensions?: string[];
 }
 
 const CONFIG_PATH = join(homedir(), '.e3rc.json');
@@ -95,17 +101,36 @@ export function getCredentials(): { username: string; password: string } | null 
   return null;
 }
 
-/** Get vault path from ~/.e3.env */
+/** Get vault path from config or env */
 export function getVaultPath(): string {
+  // Check ~/.e3rc.json first
+  const config = loadConfig();
+  if (config.vaultPath) return config.vaultPath;
+
+  // Fallback to ~/.e3.env
   try {
     const raw = readFileSync(ENV_PATH, 'utf-8');
     const vault = raw.match(/^VAULT_PATH=(.+)$/m)?.[1]?.trim();
     if (vault) return vault;
   } catch { /* ignore */ }
+
   throw new Error(
-    'Obsidian vault 路徑未設定。請在 ~/.e3.env 加入:\n' +
-    '  VAULT_PATH=C:\\path\\to\\your\\vault',
+    'Obsidian vault 路徑未設定。請用以下任一方式設定:\n' +
+    '  1. e3 config set vaultPath "C:\\path\\to\\vault"\n' +
+    '  2. 在 ~/.e3.env 加入 VAULT_PATH=C:\\path\\to\\vault',
   );
+}
+
+/** Get excluded courses from config */
+export function getExcludedCourses(): string[] {
+  const config = loadConfig();
+  return config.excludedCourses ?? [];
+}
+
+/** Get excluded file extensions from config */
+export function getExcludedExtensions(): string[] {
+  const config = loadConfig();
+  return config.excludedExtensions ?? [];
 }
 
 /**
