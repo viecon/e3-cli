@@ -7,13 +7,13 @@ description: 下載 E3 課程講義
 
 ```bash
 # 列出檔案（不下載）
-node "C:\Users\twsha\Desktop\E3 plugin\packages\cli\dist\bin\e3.js" download <course-id> --list
+node "packages\cli\dist\bin\e3.js" download <course-id> --list
 
 # 下載到指定目錄
-node "C:\Users\twsha\Desktop\E3 plugin\packages\cli\dist\bin\e3.js" download <course-id> -o ./downloads
+node "packages\cli\dist\bin\e3.js" download <course-id> -o ./downloads
 
 # 只下載 PDF
-node "C:\Users\twsha\Desktop\E3 plugin\packages\cli\dist\bin\e3.js" download <course-id> --type pdf -o ./downloads
+node "packages\cli\dist\bin\e3.js" download <course-id> --type pdf -o ./downloads
 ```
 
 用 `e3 courses --json` 查課程 ID。
