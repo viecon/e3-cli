@@ -1,0 +1,50 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run tests
+        run: pnpm test
+
+      - name: Build all
+        run: |
+          pnpm --filter @e3/core build
+          pnpm --filter @e3/cli build
+          cd packages/extension && npx wxt build && npx wxt build --browser firefox
+
+      - name: Package Chrome extension
+        run: cd packages/extension/.output && zip -r ../../chrome-extension.zip chrome-mv3/
+
+      - name: Package Firefox extension
+        run: cd packages/extension/.output && zip -r ../../firefox-extension.zip firefox-mv2/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            packages/chrome-extension.zip
+            packages/firefox-extension.zip
+          generate_release_notes: true
