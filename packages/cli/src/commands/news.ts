@@ -1,3 +1,4 @@
+import { SECONDS_PER_DAY } from '@e3/core';
 import { Command } from 'commander';
 import chalk from 'chalk';
 import ora from 'ora';
@@ -28,7 +29,7 @@ export function registerNewsCommand(program: Command): void {
           courseids = courses.map(c => c.id);
         }
 
-        const sinceTimestamp = Math.floor(Date.now() / 1000) - Number(opts.days) * 86400;
+        const sinceTimestamp = Math.floor(Date.now() / 1000) - Number(opts.days) * SECONDS_PER_DAY;
 
         // Get news forums for all courses
         const forums = await getForums(client, courseids);

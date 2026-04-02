@@ -14,30 +14,19 @@ import { safeJoin, sanitizeFilename } from '../sanitize.js';
 import { stripHtml } from '../html.js';
 import { createClient } from '../createClient.js';
 
-// Default exclusions (used when config has none)
-const DEFAULT_EXCLUDED_COURSES = [
-  '服務學習', 'Service Learning',
-  '高效能計算概論', 'High-Performance Computing',
-  '日文', 'Japanese',
-  'Gender Equity', '性別平等',
-];
-
-const DEFAULT_EXCLUDED_EXTENSIONS = ['mp4', 'mkv', 'avi', 'mov', 'wmv', 'flv', 'pkt'];
-
-// 講義檔案類型
 const SLIDE_EXTENSIONS = ['pdf', 'pptx', 'ppt', 'docx', 'doc', 'xlsx'];
 
 function isExcludedCourse(fullname: string): boolean {
   const exclusions = getExcludedCourses();
-  const list = exclusions.length > 0 ? exclusions : DEFAULT_EXCLUDED_COURSES;
-  return list.some(k => fullname.toLowerCase().includes(k.toLowerCase()));
+  if (exclusions.length === 0) return false;
+  return exclusions.some(k => fullname.toLowerCase().includes(k.toLowerCase()));
 }
 
 function isExcludedFile(filename: string): boolean {
   const exclusions = getExcludedExtensions();
-  const list = exclusions.length > 0 ? exclusions : DEFAULT_EXCLUDED_EXTENSIONS;
+  if (exclusions.length === 0) return false;
   const ext = filename.split('.').pop()?.toLowerCase() ?? '';
-  return list.includes(ext);
+  return exclusions.includes(ext);
 }
 
 function isSlideFile(filename: string): boolean {

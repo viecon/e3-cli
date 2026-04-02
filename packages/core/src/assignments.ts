@@ -5,6 +5,7 @@ import type {
   SubmissionStatus,
 } from './types.js';
 import { MoodleClient } from './client.js';
+import { SECONDS_PER_DAY } from './constants.js';
 
 /**
  * Get all assignments for the given course IDs.
@@ -60,12 +61,12 @@ export async function getPendingAssignmentsViaCalendar(
   daysAhead: number = 60,
 ): Promise<PendingAssignment[]> {
   const now = Math.floor(Date.now() / 1000);
-  const until = now + daysAhead * 86400;
+  const until = now + daysAhead * SECONDS_PER_DAY;
 
   const result = await client.call<{
     events: CalendarEvent[];
   }>('core_calendar_get_action_events_by_timesort', {
-    timesortfrom: now - 86400, // include slightly past events
+    timesortfrom: now - SECONDS_PER_DAY, // include slightly past events
     timesortto: until,
   });
 
@@ -78,7 +79,7 @@ export async function getPendingAssignmentsViaCalendar(
 
     pending.push({
       id: event.instance,
-      cmid: event.instance, // Use instance as cmid proxy
+      cmid: event.instance, // calendar API instance == cmid for assign events
       courseId: event.course?.id ?? 0,
       courseName: event.course?.fullname ?? '',
       courseShortname: event.course?.shortname ?? '',

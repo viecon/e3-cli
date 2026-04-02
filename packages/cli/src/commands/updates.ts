@@ -1,3 +1,4 @@
+import { SECONDS_PER_DAY } from '@e3/core';
 import { Command } from 'commander';
 import chalk from 'chalk';
 import ora from 'ora';
@@ -16,7 +17,7 @@ export function registerUpdatesCommand(program: Command): void {
         const client = createClient();
 
         const spinner = ora('取得更新...').start();
-        const since = Math.floor(Date.now() / 1000) - Number(opts.days) * 86400;
+        const since = Math.floor(Date.now() / 1000) - Number(opts.days) * SECONDS_PER_DAY;
 
         let courseids: { id: number; name: string }[];
         if (courseId) {

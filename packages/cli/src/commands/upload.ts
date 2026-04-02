@@ -15,6 +15,8 @@ export function registerUploadCommand(program: Command): void {
     .action(async (assignmentId: string, filePaths: string[], opts) => {
       try {
         const client = createClient();
+        const id = Number(assignmentId);
+        if (isNaN(id)) { console.error(chalk.red('Invalid assignment ID')); process.exit(1); }
 
         // Read files
         const files = filePaths.map(fp => {
@@ -40,7 +42,7 @@ export function registerUploadCommand(program: Command): void {
         // Submit
         if (opts.submit !== false) {
           const submitSpinner = ora('提交作業中...').start();
-          await saveSubmission(client, Number(assignmentId), itemid);
+          await saveSubmission(client, id, itemid);
           submitSpinner.succeed('作業提交成功！');
         } else {
           console.log(chalk.yellow('檔案已上傳，但未提交（使用 --no-submit 選項）'));
