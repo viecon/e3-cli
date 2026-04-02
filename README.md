@@ -2,87 +2,115 @@
 
 NYCU E3 LMS 助手工具 — 讓交大 E3 更好用。
 
-## 功能
+## CLI 工具
 
-### 🖥️ 瀏覽器 Extension (Chrome + Zen Browser)
-- **未完成作業追蹤** — 依截止日標色（紅/黃/綠）
-- **課程瀏覽** — 快速開啟課程、批次下載教材
-- **批次上傳** — 拖放多個檔案一次提交作業
-- **截止日時間軸** — 視覺化近期 deadline
-- **成績總覽** — 各課程成績一覽
-- **E3 頁面增強** — 浮動按鈕、課程頁面批次下載按鈕
-
-### ⌨️ CLI 工具
 ```bash
-e3 login --token <token>     # 登入
-e3 courses                   # 列出課程
+# 認證
+e3 login -u <帳號>           # 帳密登入（互動式密碼輸入）
+e3 login --token <token>     # Token 登入
+e3 logout                    # 登出
+e3 whoami                    # 查看登入狀態
+
+# 總覽
+e3 status                    # 一鍵總覽（作業 + 通知 + 課程）
+
+# 課程
+e3 courses                   # 列出選修課程
+e3 open <課程名>             # 用瀏覽器開啟課程（支援模糊搜尋）
+e3 open calendar             # 開啟 E3 行事曆
+
+# 作業
 e3 assignments               # 未完成作業
-e3 download <course-id>      # 下載教材
-e3 upload <id> file1 file2   # 上傳作業
-e3 grades                    # 查看成績
-e3 calendar                  # 行事曆
-e3 sync                      # 同步到 Obsidian
+e3 submission <id>           # 作業提交詳情與回饋
+
+# 教材
+e3 download <course-id>      # 下載課程教材
+e3 download --all            # 下載所有課程教材
+e3 download --all --skip-existing  # 跳過已下載的
+
+# 上傳
+e3 upload <assignment-id> file1 file2  # 上傳並提交
+
+# 資訊
+e3 grades [course-id]        # 成績查詢
+e3 calendar --days 14        # 行事曆事件
+e3 news                      # 課程公告
+e3 updates                   # 課程最近更新
+e3 notifications             # 系統通知
+
+# Obsidian 同步
+e3 sync                      # 同步講義 + 作業到 Obsidian vault
 ```
 
-### 🤖 Claude Code Skills
-在 Claude Code 中直接操作 E3：
-- `/e3-courses` — 列出課程
-- `/e3-assignments` — 查看作業
-- `/e3-download` — 下載教材
-- `/e3-sync` — 同步講義到 Obsidian + AI 生成筆記
+所有指令支援 `--json` 輸出。
 
-### 📝 Obsidian 自動同步 Workflow
-- 下載新講義到 `{課程}/slides/`
-- 用 Python 提取投影片文字（PDF/PPTX/DOCX）
-- Claude Code 讀取內容生成結構化筆記
-- 同步作業到 Obsidian Calendar
-- 支援 Windows Task Scheduler 排程
+## 瀏覽器 Extension (Chrome + Zen Browser)
+
+- **快速面板** — E3 頁面右下角按鈕，展開顯示未繳作業和課程連結，直接跳轉
+- **批次下載** — 課程頁面一鍵下載所有教材
+- **截止日提醒** — 首頁自動提醒 7 天內到期的作業
+- **作業提示** — 作業提交頁面提示批次上傳功能
+- **Popup** — 未繳作業列表 + 課程列表
+- **Side Panel** — 完整功能面板（作業/課程/行事曆/成績）
+- **Badge** — Toolbar icon 顯示未繳作業數量
+
+## Obsidian 自動同步 Workflow
+
+```bash
+scripts/e3-sync.bat          # 完整 workflow（下載 + AI 生成筆記）
+```
+
+1. 下載新講義到 `{課程}/slides/`，按章節建立筆記
+2. 同步未繳作業到 `Calendar/`（Obsidian Calendar 格式）
+3. 用 Python 提取投影片文字（PDF/PPTX/DOCX）
+4. Claude Code 讀取內容生成結構化筆記
+5. Token 過期時自動用帳密重新登入
+
+設定檔：`~/.e3.env`（帳密 + vault 路徑）、`~/.e3rc.json`（token）
+
+## Claude Code Skills
+
+```
+/e3-status      — 總覽
+/e3-courses     — 課程
+/e3-assignments — 作業
+/e3-news        — 公告
+/e3-download    — 下載
+/e3-upload      — 上傳
+/e3-grades      — 成績
+/e3-sync        — Obsidian 同步 + AI 筆記
+```
 
 ## 安裝
 
-### 前置需求
-- Node.js 18+
-- pnpm (`npm install -g pnpm`)
-- Python 3 (for slide extraction)
-
-### 建置
 ```bash
-pnpm install
-pnpm build
+# 建置
+pnpm install && pnpm build
 
-# Extension
-cd packages/extension
-npx wxt build              # Chrome
-npx wxt build --browser firefox  # Firefox/Zen
+# Extension (Chrome)
+# chrome://extensions → 開發者模式 → 載入 packages/extension/.output/chrome-mv3
+
+# Extension (Zen/Firefox)
+# about:debugging → 載入 .output/firefox-mv2/manifest.json
+
+# CLI 登入
+node packages/cli/dist/bin/e3.js login -u <帳號>
 ```
 
-### CLI 登入
-E3 使用交大 SSO + 2FA，需要手動取得 token：
-```bash
-# 方式 1: 帳號密碼（需在 E3 設定中放寬 2FA）
-node packages/cli/dist/bin/e3.js login --token <token>
-
-# 方式 2: Session cookie（從瀏覽器複製）
-node packages/cli/dist/bin/e3.js login --session <MoodleSession>
-```
-
-### Extension 安裝
-**Chrome**: `chrome://extensions` → 開發者模式 → 載入 `packages/extension/.output/chrome-mv3`
-
-**Zen Browser**: `about:debugging` → 載入暫時性附加元件 → 選 `.output/firefox-mv2/manifest.json`
+需要 Node.js 18+、pnpm、Python 3（投影片提取）。
 
 ## 專案結構
 
 ```
-├── packages/
-│   ├── core/          # 共享 Moodle API 客戶端
-│   ├── cli/           # CLI 工具
-│   └── extension/     # 瀏覽器 Extension (WXT + React)
-├── scripts/
-│   ├── e3-sync.bat    # 自動同步 workflow
-│   ├── extract-slides.py  # 投影片文字提取
-│   └── find-stubs.js  # 找需要 AI 填入的空筆記
-└── .claude/skills/    # Claude Code Skills
+packages/
+  core/          — 共享 Moodle API 客戶端（REST + AJAX + 頁面爬取）
+  cli/           — CLI 工具（16 個指令）
+  extension/     — 瀏覽器 Extension（WXT + React + Tailwind）
+scripts/
+  e3-sync.bat    — 自動同步 workflow
+  extract-slides.py  — 投影片文字提取
+  generate-notes-prompt.md  — AI 筆記生成 prompt
+.claude/skills/  — Claude Code Skills
 ```
 
 ## License
