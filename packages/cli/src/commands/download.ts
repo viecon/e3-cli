@@ -3,8 +3,8 @@ import chalk from 'chalk';
 import ora from 'ora';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { MoodleClient, listCourseFiles, getUserCourses } from '@e3/core';
-import { loadConfig, getBaseUrl, requireAuth, getUserId } from '../config.js';
+import { MoodleClient, listCourseFiles, getEnrolledCourses } from '@e3/core';
+import { loadConfig, getBaseUrl, requireAuth } from '../config.js';
 import { formatFileSize, printJson } from '../output.js';
 
 export function registerDownloadCommand(program: Command): void {
@@ -50,8 +50,7 @@ export function registerDownloadCommand(program: Command): void {
         }
 
         // Get course name for folder
-        const userid = getUserId();
-        const courses = await getUserCourses(client, userid);
+        const courses = await getEnrolledCourses(client, 'all');
         const course = courses.find(c => c.id === Number(courseId));
         const folderName = course
           ? course.shortname.replace(/[<>:"/\\|?*]/g, '_')

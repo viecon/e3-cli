@@ -3,11 +3,11 @@ import chalk from 'chalk';
 import ora from 'ora';
 import {
   MoodleClient,
-  getUserCourses,
+  getEnrolledCourses,
   getCourseContents,
-  getPendingAssignments,
+  getPendingAssignmentsViaCalendar,
 } from '@e3/core';
-import { loadConfig, getBaseUrl, requireAuth, getUserId } from '../config.js';
+import { loadConfig, getBaseUrl, requireAuth } from '../config.js';
 
 interface ObsidianConfig {
   apiUrl: string;
@@ -66,17 +66,16 @@ export function registerObsidianCommand(program: Command): void {
           sessionCookie: config.session,
           baseUrl: getBaseUrl(),
         });
-        const userid = getUserId();
+        const allCourses = await getEnrolledCourses(client, 'all');
 
         let courseIds: number[];
         if (opts.all) {
-          const courses = await getUserCourses(client, userid);
-          courseIds = courses.filter(c => c.visible && !c.hidden).map(c => c.id);
+          courseIds = allCourses.map(c => c.id);
         } else {
           courseIds = [Number(courseId)];
         }
 
-        const courses = await getUserCourses(client, userid);
+        const courses = allCourses;
 
         for (const cid of courseIds) {
           const course = courses.find(c => c.id === cid);
@@ -125,7 +124,7 @@ export function registerObsidianCommand(program: Command): void {
           await obsidianPut(obsConfig, `${coursePath}/課程大綱.md`, lines.join('\n'));
 
           // Sync pending assignments
-          const pending = await getPendingAssignments(client, [cid]);
+          const pending = await getPendingAssignmentsViaCalendar(client, 90);
           if (pending.length > 0) {
             const assignLines: string[] = [
               `---`,
