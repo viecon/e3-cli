@@ -16,6 +16,7 @@ import { registerUpdatesCommand } from '../src/commands/updates.js';
 import { registerNotificationsCommand } from '../src/commands/notifications.js';
 import { registerStatusCommand } from '../src/commands/status.js';
 import { registerOpenCommand } from '../src/commands/open.js';
+import { registerExportCommand } from '../src/commands/export.js';
 
 const program = new Command();
 
@@ -39,5 +40,6 @@ registerUpdatesCommand(program);
 registerNotificationsCommand(program);
 registerStatusCommand(program);
 registerOpenCommand(program);
+registerExportCommand(program);
 
 program.parse();
