@@ -18,3 +18,4 @@ _pdf_text/
 *.swp
 *.swo
 *.env.local
+.sync-state.json

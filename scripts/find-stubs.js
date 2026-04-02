@@ -1,17 +1,15 @@
-// Find notes that need AI-generated or updated content.
-// Criteria:
-//   1. Stub: .md < 300 bytes with matching slide (needs full generation)
-//   2. Outdated: slide modified after note was last modified (needs update)
+// Find notes that need AI-generated content.
+// Triggers:
+//   1. Stub: .md < 300 bytes with matching slide
+//   2. New slide: slide file not seen in previous sync (tracked via .sync-state.json)
 const fs = require('fs');
 const path = require('path');
 
 function getVaultPath() {
-  // Check ~/.e3rc.json first
   try {
     const config = JSON.parse(fs.readFileSync(path.join(require('os').homedir(), '.e3rc.json'), 'utf-8'));
     if (config.vaultPath) return config.vaultPath;
   } catch {}
-  // Fallback to ~/.e3.env
   try {
     const raw = fs.readFileSync(path.join(require('os').homedir(), '.e3.env'), 'utf-8');
     const match = raw.match(/^VAULT_PATH=(.+)$/m);
@@ -22,10 +20,16 @@ function getVaultPath() {
 }
 
 const vault = process.argv[2] || getVaultPath();
-const STUB_THRESHOLD = 300; // bytes
+const STUB_THRESHOLD = 300;
 const excludeDirs = ['Calendar', 'assets', 'daily', '.obsidian', '.git', '留學'];
 const slideExts = ['.pdf', '.pptx', '.ppt', '.docx', '.doc'];
 
+// Load previous sync state (known slides)
+const stateFile = path.join(__dirname, '.sync-state.json');
+let knownSlides = {};
+try { knownSlides = JSON.parse(fs.readFileSync(stateFile, 'utf-8')); } catch {}
+
+const currentSlides = {};
 const results = [];
 
 for (const dir of fs.readdirSync(vault)) {
@@ -49,18 +53,20 @@ for (const dir of fs.readdirSync(vault)) {
     const matchedSlides = slides.filter(s => slideExts.some(ext => s.toLowerCase().endsWith(ext)));
     if (matchedSlides.length === 0) continue;
 
-    // Check reason: stub or outdated
+    // Track all current slides
+    for (const s of matchedSlides) {
+      currentSlides[path.join(slidesDir, s)] = true;
+    }
+
     let reason = null;
 
     if (noteStat.size < STUB_THRESHOLD) {
       reason = 'stub';
     } else {
-      // Check if any slide was modified after the note
-      const latestSlideTime = Math.max(
-        ...matchedSlides.map(s => fs.statSync(path.join(slidesDir, s)).mtimeMs)
-      );
-      if (latestSlideTime > noteStat.mtimeMs) {
-        reason = 'outdated';
+      // Check if any matched slide is NEW (not in previous state)
+      const hasNewSlide = matchedSlides.some(s => !knownSlides[path.join(slidesDir, s)]);
+      if (hasNewSlide) {
+        reason = 'new-slide';
       }
     }
 
@@ -76,6 +82,9 @@ for (const dir of fs.readdirSync(vault)) {
     }
   }
 }
+
+// Save current state for next run
+fs.writeFileSync(stateFile, JSON.stringify(currentSlides, null, 2));
 
 console.log(JSON.stringify(results, null, 2));
 if (results.length > 0) process.exit(0);
