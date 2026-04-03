@@ -80,12 +80,22 @@ function courseFolderName(_shortname: string, fullname: string): string {
 }
 
 function extractShortCourseName(fullname: string): string {
+  // fullname e.g. "1142.515622.生成式AI概論：從理論到應用 Introduction to Generative AI..."
   const parts = fullname.split('.');
   const lastPart = parts[parts.length - 1] ?? fullname;
-  const chineseMatch = lastPart.match(/[\u4e00-\u9fff\uff08\uff09()]+/g);
-  if (chineseMatch) return chineseMatch.join('').slice(0, 10);
+  // Take the Chinese portion (before the English title after a space)
+  const chineseTitle = lastPart.match(
+    /[\u4e00-\u9fff\uff08\uff09()A-Za-z0-9\-：:]+/,
+  );
+  if (chineseTitle) {
+    // Trim trailing English words that belong to the English title
+    const cleaned = chineseTitle[0]
+      .replace(/\s+[A-Z][a-zA-Z\s]*$/, '')
+      .trim();
+    if (cleaned) return cleaned;
+  }
   const englishMatch = lastPart.match(/[A-Z][a-zA-Z\s]+/);
-  return (englishMatch?.[0] ?? lastPart).trim().slice(0, 20);
+  return (englishMatch?.[0] ?? lastPart).trim();
 }
 
 function formatDateISO(ts: number): string {
