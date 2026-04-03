@@ -18,7 +18,7 @@ Log 在 `scripts/sync.log`。
 ### Step 1: 同步講義和作業
 
 ```bash
-node "packages\cli\dist\bin\e3.js" sync
+e3 sync
 ```
 
 下載新講義到 `{vault}/{課程}/slides/`，建 stub 筆記，同步作業到 `Calendar/`。

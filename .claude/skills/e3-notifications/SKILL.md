@@ -4,6 +4,6 @@ description: 查看 E3 系統通知
 ---
 
 ```bash
-node packages/cli/dist/bin/e3.js notifications --json
-node packages/cli/dist/bin/e3.js notifications --limit 5 --json
+e3 notifications --json
+e3 notifications --limit 5 --json
 ```

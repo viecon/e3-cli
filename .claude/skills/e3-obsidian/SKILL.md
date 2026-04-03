@@ -8,7 +8,7 @@ description: 同步 E3 課程內容到 Obsidian（已整合進 e3 sync）
 此功能已整合進 `e3 sync` 指令。直接用：
 
 ```bash
-node "packages\cli\dist\bin\e3.js" sync
+e3 sync
 ```
 
 或跑完整 workflow：

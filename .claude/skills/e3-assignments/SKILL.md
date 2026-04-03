@@ -6,7 +6,7 @@ description: 查看 E3 未完成作業
 # E3 未完成作業
 
 ```bash
-node "packages\cli\dist\bin\e3.js" assignments --json
+e3 assignments --json
 ```
 
 用 calendar API 取得未繳作業（actionable=true 的 assignment 事件）。

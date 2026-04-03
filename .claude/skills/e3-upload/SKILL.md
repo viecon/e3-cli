@@ -7,10 +7,10 @@ description: 上傳檔案到 E3 並提交作業
 
 ```bash
 # 上傳並提交
-node "packages\cli\dist\bin\e3.js" upload <assignment-id> file1.pdf file2.zip
+e3 upload <assignment-id> file1.pdf file2.zip
 
 # 只上傳不提交
-node "packages\cli\dist\bin\e3.js" upload <assignment-id> file1.pdf --no-submit
+e3 upload <assignment-id> file1.pdf --no-submit
 ```
 
 用 `e3 assignments --json` 查 assignment ID。

@@ -19,7 +19,8 @@ pnpm test             # 跑測試 (vitest, 35 tests)
 pnpm lint             # ESLint
 pnpm dev              # Extension 開發 (Chrome, watch mode)
 pnpm dev:firefox      # Extension 開發 (Firefox/Zen)
-pnpm cli              # 執行 CLI (= node packages/cli/dist/bin/e3.js)
+pnpm cli              # 執行 CLI (開發用)
+e3                    # 全域指令 (npm link 安裝)
 ```
 
 ## E3 API
