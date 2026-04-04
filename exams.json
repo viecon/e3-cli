@@ -1,5 +1,6 @@
 [
   { "name": "小考", "course": "計算機組織", "date": "2026-04-09", "startTime": "13:20", "endTime": "13:50" },
+  { "name": "期中考", "course": "日文（二）", "date": "2026-04-14", "allDay": true },
   { "name": "期中考", "course": "網路安全實務-攻擊與防禦", "date": "2026-04-15", "startTime": "10:10", "endTime": "12:00" },
   { "name": "期中考", "course": "計算機組織", "date": "2026-04-16", "startTime": "13:20", "endTime": "15:10" },
   { "name": "期中考", "course": "記憶體與儲存系統", "date": "2026-04-20", "startTime": "13:20", "endTime": "15:10" },
