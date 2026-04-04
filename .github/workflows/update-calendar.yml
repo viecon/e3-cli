@@ -31,16 +31,23 @@ jobs:
           E3_PASSWORD: ${{ secrets.E3_PASSWORD }}
           E3_BASE_URL: https://e3p.nycu.edu.tw
         run: |
-          # Try existing token first, login if expired
-          if [ -n "${{ secrets.E3_TOKEN }}" ]; then
-            echo '{"token":"${{ secrets.E3_TOKEN }}","baseUrl":"'"$E3_BASE_URL"'","authMode":"token"}' > ~/.e3rc.json
-          fi
+          # Get token directly via Moodle API (no interactive CLI needed)
+          echo "Fetching token..."
+          TOKEN=$(curl -s -X POST "$E3_BASE_URL/login/token.php" \
+            -d "username=$E3_USERNAME&password=$E3_PASSWORD&service=moodle_mobile_app" \
+            | node -e "process.stdin.on('data',d=>{const j=JSON.parse(d);if(j.token)process.stdout.write(j.token);else{console.error(j.error);process.exit(1)}})")
 
-          # Test if token works, if not, login with credentials
-          if ! node packages/cli/dist/bin/e3.js whoami 2>/dev/null; then
-            echo "Token expired, logging in..."
-            node packages/cli/dist/bin/e3.js login -u "$E3_USERNAME" -p "$E3_PASSWORD"
+          if [ -z "$TOKEN" ]; then
+            echo "Failed to get token"
+            exit 1
           fi
+          echo "Token obtained"
+
+          # Write config
+          echo "{\"token\":\"$TOKEN\",\"baseUrl\":\"$E3_BASE_URL\",\"authMode\":\"token\"}" > ~/.e3rc.json
+
+          # Verify
+          node packages/cli/dist/bin/e3.js whoami
 
           # Copy exams config
           [ -f exams.json ] && cp exams.json ~/.e3-exams.json
