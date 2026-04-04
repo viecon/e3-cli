@@ -18,6 +18,10 @@ export function registerAuthCommands(program: Command): void {
 
         // If username provided without password, prompt interactively
         if (opts.username && !opts.password) {
+          if (!process.stdin.isTTY) {
+            console.error(chalk.red('無法互動式輸入密碼（非 TTY 環境）。請使用 -p 參數提供密碼。'));
+            process.exit(1);
+          }
           const { createInterface } = await import('node:readline');
           const rl = createInterface({ input: process.stdin, output: process.stdout });
           opts.password = await new Promise<string>((resolve) => {
