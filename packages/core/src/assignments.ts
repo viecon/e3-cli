@@ -22,12 +22,14 @@ export async function getAssignments(
 
 /**
  * Get submission status for a specific assignment.
+ * Accepts cmid and auto-resolves to assign id.
  * Uses REST API (token auth).
  */
 export async function getSubmissionStatus(
   client: MoodleClient,
-  assignid: number,
+  cmid: number,
 ): Promise<SubmissionStatus> {
+  const assignid = await resolveAssignId(client, cmid);
   return client.call<SubmissionStatus>('mod_assign_get_submission_status', {
     assignid,
   });
@@ -36,13 +38,34 @@ export async function getSubmissionStatus(
 /**
  * Submit an assignment with files from the draft area.
  */
+/**
+ * Resolve a cmid (course_modules.id) to the assign instance id (assign.id).
+ * mod_assign_save_submission requires the assign table id, not the cmid.
+ */
+export async function resolveAssignId(
+  client: MoodleClient,
+  cmid: number,
+): Promise<number> {
+  // core_course_get_course_module returns { cm: { instance, course, ... } }
+  const result = await client.call<{ cm: { instance: number; course: number } }>(
+    'core_course_get_course_module',
+    { cmid },
+  );
+  return result.cm.instance;
+}
+
+/**
+ * Submit an assignment with files from the draft area.
+ * Accepts cmid (what the calendar API returns) and auto-resolves to assign id.
+ */
 export async function saveSubmission(
   client: MoodleClient,
-  assignmentid: number,
+  cmid: number,
   draftItemId: number,
 ): Promise<void> {
+  const assignid = await resolveAssignId(client, cmid);
   await client.call('mod_assign_save_submission', {
-    assignmentid,
+    assignmentid: assignid,
     plugindata: {
       files_filemanager: draftItemId,
     },

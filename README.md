@@ -104,21 +104,104 @@ scripts/e3-sync.bat          # 完整 workflow（下載 + AI 生成筆記）
 
 ## 安裝
 
+### 前置需求
+
+- **Node.js 22+**（見 `.nvmrc`）
+  - Windows: `winget install OpenJS.NodeJS.LTS` 或用 [nvm-windows](https://github.com/coreybutler/nvm-windows)
+  - macOS: `brew install node@22`
+  - Linux: `curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt-get install -y nodejs`
+- **pnpm**
+  - `npm install -g pnpm` 或 `corepack enable && corepack prepare pnpm@latest --activate`
+- **Python 3**（僅 Obsidian 同步的投影片提取需要，CLI 本身不需要）
+
+### 建置
+
 ```bash
-# 建置
-pnpm install && pnpm build
-
-# Extension (Chrome)
-# chrome://extensions → 開發者模式 → 載入 packages/extension/.output/chrome-mv3
-
-# Extension (Zen/Firefox)
-# about:debugging → 載入 .output/firefox-mv2/manifest.json
-
-# CLI 登入
-node packages/cli/dist/bin/e3.js login -u <帳號>
+git clone https://github.com/<你的帳號>/e3-assistant.git
+cd e3-assistant
+pnpm install
+pnpm build
 ```
 
-需要 Node.js 22+（見 .nvmrc）、pnpm、Python 3（投影片提取）。
+### CLI 登入
+
+```bash
+# 方法 1: 帳密登入（推薦，會自動取得 token）
+node packages/cli/dist/bin/e3.js login -u <學號>
+
+# 方法 2: Token 登入（從 E3 網頁取得）
+node packages/cli/dist/bin/e3.js login --token <your-token>
+```
+
+### 加入 PATH（讓 `e3` 全域可用）
+
+每次都打 `node packages/cli/dist/bin/e3.js` 很煩。可以用以下方式把 `e3` 加到 PATH：
+
+#### 方法 1: npm link（推薦）
+
+```bash
+cd packages/cli
+npm link
+```
+
+之後在任何地方都可以直接打 `e3`：
+
+```bash
+e3 status
+e3 assignments
+e3 upload 200536 report.pdf
+```
+
+#### 方法 2: 手動加 alias
+
+**Windows (PowerShell)**：在 `$PROFILE` 裡加：
+```powershell
+function e3 { node "C:\path\to\e3-assistant\packages\cli\dist\bin\e3.js" @args }
+```
+
+**Windows (Git Bash / MSYS2)**：在 `~/.bashrc` 裡加：
+```bash
+alias e3='node "/c/path/to/e3-assistant/packages/cli/dist/bin/e3.js"'
+```
+
+**macOS / Linux**：在 `~/.bashrc` 或 `~/.zshrc` 裡加：
+```bash
+alias e3='node /path/to/e3-assistant/packages/cli/dist/bin/e3.js'
+```
+
+#### 方法 3: 建立 symlink
+
+**macOS / Linux**：
+```bash
+sudo ln -s "$(pwd)/packages/cli/dist/bin/e3.js" /usr/local/bin/e3
+```
+
+**Windows (管理員 PowerShell)**：
+```powershell
+New-Item -ItemType SymbolicLink -Path "$env:LOCALAPPDATA\Microsoft\WindowsApps\e3.cmd" -Target "node `"C:\path\to\e3-assistant\packages\cli\dist\bin\e3.js`""
+```
+
+### 瀏覽器 Extension
+
+**Chrome / Edge / Arc**：
+1. 開啟 `chrome://extensions`
+2. 開啟「開發者模式」
+3. 點「載入未封裝項目」→ 選 `packages/extension/.output/chrome-mv3`
+
+**Firefox / Zen Browser**：
+1. 開啟 `about:debugging#/runtime/this-firefox`
+2. 點「載入暫用附加元件」→ 選 `.output/firefox-mv2/manifest.json`
+
+### Claude Code Skills
+
+把 `.claude/skills/` 資料夾複製到你的專案或 `~/.claude/skills/`，就能在 Claude Code 裡用 `/e3-*` 指令。Skills 會呼叫 CLI，所以要先確保 CLI 建置完成且已登入。
+
+### 驗證安裝
+
+```bash
+e3 whoami          # 應顯示你的學號和姓名
+e3 status          # 應顯示未繳作業 + 通知 + 課程數
+```
 
 ## 專案結構
 
