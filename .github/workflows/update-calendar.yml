@@ -1,0 +1,54 @@
+name: Update E3 Calendar
+
+on:
+  schedule:
+    # Every 6 hours
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # Manual trigger
+
+permissions:
+  contents: write
+  pages: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @e3/core build && pnpm --filter @e3/cli build
+
+      - name: Generate ICS
+        env:
+          E3_TOKEN: ${{ secrets.E3_TOKEN }}
+          E3_BASE_URL: https://e3p.nycu.edu.tw
+        run: |
+          # Write config
+          echo '{"token":"'$E3_TOKEN'","baseUrl":"'$E3_BASE_URL'","authMode":"token"}' > ~/.e3rc.json
+
+          # Copy exams file if exists in repo
+          if [ -f exams.json ]; then
+            cp exams.json ~/.e3-exams.json
+          fi
+
+          # Generate ICS
+          node packages/cli/dist/bin/e3.js calendar --ics public/e3-calendar.ics --ics-days 120
+
+          cat public/e3-calendar.ics | head -5
+          echo "Events: $(grep -c 'BEGIN:VEVENT' public/e3-calendar.ics)"
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          keep_files: true

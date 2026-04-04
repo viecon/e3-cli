@@ -21,6 +21,7 @@ export { getNotifications } from './notifications.js';
 export {
   getAssignments,
   getSubmissionStatus,
+  resolveAssignId,
   saveSubmission,
   getPendingAssignments,
   getPendingAssignmentsViaCalendar,
@@ -35,6 +36,10 @@ export { getUpcomingEvents } from './calendar.js';
 
 // Grades
 export { getCourseGrades, getAllGrades } from './grades.js';
+
+// ICS
+export { generateICS } from './ics.js';
+export type { ICSEvent } from './ics.js';
 
 // Utils
 export { flattenParams } from './utils.js';
