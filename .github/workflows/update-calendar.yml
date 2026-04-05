@@ -49,10 +49,7 @@ jobs:
           # Verify
           node packages/cli/dist/bin/e3.js whoami
 
-          # Copy exams config
-          [ -f exams.json ] && cp exams.json ~/.e3-exams.json
-
-          # Generate ICS
+          # Generate ICS (CLI reads calendar-events.json from repo root via cwd)
           node packages/cli/dist/bin/e3.js calendar --ics public/e3-calendar.ics --ics-days 120
           echo "Events: $(grep -c 'BEGIN:VEVENT' public/e3-calendar.ics)"
 

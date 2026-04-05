@@ -8,7 +8,20 @@ import { getUpcomingEvents, getPendingAssignmentsViaCalendar, generateICS, type 
 import { printTable, printJson, formatDate, urgencyColor } from '../output.js';
 import { createClient } from '../createClient.js';
 
-const CALENDAR_EVENTS_PATH = join(homedir(), '.calendar-events.json');
+// Look for calendar-events.json: repo root first, then home dir fallback
+function findCalendarEventsPath(): string {
+  // Walk up from this file to find repo root (where calendar-events.json lives)
+  let dir = process.cwd();
+  for (let i = 0; i < 10; i++) {
+    const candidate = join(dir, 'calendar-events.json');
+    if (existsSync(candidate)) return candidate;
+    const parent = join(dir, '..');
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return join(homedir(), '.calendar-events.json');
+}
+const CALENDAR_EVENTS_PATH = findCalendarEventsPath();
 
 interface ManualExam {
   name: string;
