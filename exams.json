@@ -5,5 +5,11 @@
   { "name": "期中考", "course": "計算機組織", "date": "2026-04-16", "startTime": "13:20", "endTime": "15:10" },
   { "name": "期中考", "course": "記憶體與儲存系統", "date": "2026-04-20", "startTime": "13:20", "endTime": "15:10" },
   { "name": "期中考", "course": "電腦安全總整與實作", "date": "2026-04-20", "startTime": "10:10", "endTime": "12:00" },
-  { "name": "期末考", "course": "電腦安全總整與實作", "date": "2026-06-01", "startTime": "10:10", "endTime": "12:00" }
+  { "name": "Final Research Proposal", "course": "記憶體與儲存系統", "date": "2026-05-25", "startTime": "13:20", "endTime": "15:10" },
+  { "name": "團體上機", "course": "網路規劃與管理實務", "date": "2026-05-29", "startTime": "10:10", "endTime": "14:10" },
+  { "name": "期末考", "course": "電腦安全總整與實作", "date": "2026-06-01", "startTime": "10:10", "endTime": "12:00" },
+  { "name": "Final Research Proposal", "course": "記憶體與儲存系統", "date": "2026-06-01", "startTime": "13:20", "endTime": "15:10" },
+  { "name": "Final 筆試", "course": "網路規劃與管理實務", "date": "2026-06-05", "startTime": "10:10", "endTime": "14:10" },
+  { "name": "Final Research Proposal", "course": "記憶體與儲存系統", "date": "2026-06-08", "startTime": "13:20", "endTime": "15:10" },
+  { "name": "Final 上機", "course": "網路規劃與管理實務", "date": "2026-06-12", "startTime": "10:10", "endTime": "14:10" }
 ]
