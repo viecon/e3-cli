@@ -8,7 +8,7 @@ import { getUpcomingEvents, getPendingAssignmentsViaCalendar, generateICS, type 
 import { printTable, printJson, formatDate, urgencyColor } from '../output.js';
 import { createClient } from '../createClient.js';
 
-const EXAMS_PATH = join(homedir(), '.e3-exams.json');
+const CALENDAR_EVENTS_PATH = join(homedir(), '.calendar-events.json');
 
 interface ManualExam {
   name: string;
@@ -21,9 +21,9 @@ interface ManualExam {
 }
 
 function loadManualExams(): ManualExam[] {
-  if (!existsSync(EXAMS_PATH)) return [];
+  if (!existsSync(CALENDAR_EVENTS_PATH)) return [];
   try {
-    return JSON.parse(readFileSync(EXAMS_PATH, 'utf-8'));
+    return JSON.parse(readFileSync(CALENDAR_EVENTS_PATH, 'utf-8'));
   } catch {
     return [];
   }
@@ -140,7 +140,7 @@ export function registerCalendarCommand(program: Command): void {
           spinner.succeed(`已產生 ${outputFile}（${events.length} 個事件：${assignments.length} 作業 + ${manualExams.length} 考試 + ${events.length - assignments.length - manualExams.length} 其他）`);
 
           if (manualExams.length === 0) {
-            console.log(chalk.yellow(`\n提示：在 ${EXAMS_PATH} 新增考試，格式：`));
+            console.log(chalk.yellow(`\n提示：在 ${CALENDAR_EVENTS_PATH} 新增考試，格式：`));
             console.log(chalk.gray(`[
   { "name": "期中考", "course": "計算機組織", "date": "2026-04-16", "startTime": "13:20", "endTime": "15:10", "location": "EC015" }
 ]`));

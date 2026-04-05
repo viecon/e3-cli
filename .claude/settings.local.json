@@ -5,5 +5,9 @@
       "Bash(pnpm --filter @e3/cli build)",
       "Bash(npx wxt:*)"
     ]
+  },
+  "enabledPlugins": {
+    "ralph-loop@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true
   }
 }
