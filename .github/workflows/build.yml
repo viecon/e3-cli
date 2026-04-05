@@ -38,23 +38,5 @@ jobs:
       - name: Build CLI
         run: pnpm --filter @e3/cli build
 
-      - name: Build extension (Chrome)
-        run: cd packages/extension && npx wxt build
-
-      - name: Build extension (Firefox)
-        run: cd packages/extension && npx wxt build --browser firefox
-
       - name: Test CLI help
         run: node packages/cli/dist/bin/e3.js --help
-
-      - name: Upload Chrome extension
-        uses: actions/upload-artifact@v4
-        with:
-          name: chrome-extension
-          path: packages/extension/.output/chrome-mv3/
-
-      - name: Upload Firefox extension
-        uses: actions/upload-artifact@v4
-        with:
-          name: firefox-extension
-          path: packages/extension/.output/firefox-mv2/

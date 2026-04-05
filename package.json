@@ -1,13 +1,9 @@
 {
   "name": "e3-assistant",
   "private": true,
-  "description": "NYCU E3 LMS Assistant - Browser Extension + CLI + Claude Code Skills",
+  "description": "NYCU E3 LMS Assistant - CLI + Core Library",
   "scripts": {
-    "build": "pnpm --filter @e3/core build && pnpm --filter @e3/cli build && pnpm --filter @e3/extension build",
-    "build:ext": "pnpm --filter @e3/extension build",
-    "build:ext:firefox": "cd packages/extension && npx wxt build --browser firefox",
-    "dev": "pnpm --filter @e3/extension dev",
-    "dev:firefox": "pnpm --filter @e3/extension dev:firefox",
+    "build": "pnpm --filter @e3/core build && pnpm --filter @e3/cli build",
     "cli": "node packages/cli/dist/bin/e3.js",
     "test": "vitest run",
     "lint": "eslint packages/core/src/ packages/cli/src/ packages/cli/bin/ --ext .ts"

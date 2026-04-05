@@ -33,18 +33,8 @@ jobs:
         run: |
           pnpm --filter @e3/core build
           pnpm --filter @e3/cli build
-          cd packages/extension && npx wxt build && npx wxt build --browser firefox
-
-      - name: Package Chrome extension
-        run: cd packages/extension/.output && zip -r ../../chrome-extension.zip chrome-mv3/
-
-      - name: Package Firefox extension
-        run: cd packages/extension/.output && zip -r ../../firefox-extension.zip firefox-mv2/
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            packages/chrome-extension.zip
-            packages/firefox-extension.zip
           generate_release_notes: true
