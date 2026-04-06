@@ -127,7 +127,7 @@ export function registerCalendarCommand(program: Command): void {
           // 3. Load manual exams
           const manualExams = loadManualExams();
           for (const exam of manualExams) {
-            const uid = `e3-exam-${exam.date}-${exam.name.replace(/\s/g, '')}@manual`;
+            const uid = `e3-exam-${exam.date}-${exam.course.replace(/\s/g, '')}-${exam.name.replace(/\s/g, '')}@manual`;
             if (seenIds.has(uid)) continue;
             seenIds.add(uid);
 
